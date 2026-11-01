@@ -1,5 +1,7 @@
 # dsh-git-sidebar
 
+> 🌐 项目主页：<https://hennychen.github.io/dsh-git-sidebar/> · 插件市场索引：<https://hennychen.github.io/dsh-git-sidebar/market/index.json>
+
 ![dsh-git-sidebar 封面](docs/cover.png)
 
 VS Code **Source Control** 风格的 Git 面板，装在 DeepSeek Harness 桌面端 Web GUI 的**右侧边栏**里。
