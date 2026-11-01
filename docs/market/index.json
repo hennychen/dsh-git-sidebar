@@ -49,6 +49,18 @@
       },
       "versions": [
         {
+          "version": "0.7.1",
+          "publishTimestamp": 1793520060,
+          "source": {
+            "type": "git",
+            "url": "https://github.com/hennychen/dsh-git-sidebar",
+            "commit": "1e6cb11446923240b110bde0113f300545eb79cc"
+          },
+          "engines": {
+            "dsh": ">=0.2.0-rc.2 <0.3.0"
+          }
+        },
+        {
           "version": "0.6.5",
           "publishTimestamp": 1793516501,
           "source": {
