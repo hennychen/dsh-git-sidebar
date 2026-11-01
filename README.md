@@ -17,7 +17,7 @@ VS Code **Source Control** 风格的 Git 面板，装在 DeepSeek Harness 桌面
 本仓库自带一份符合官方规范的插件市场索引，可直接作为「发现」的索引源：
 
 ```
-https://raw.githubusercontent.com/hennychen/dsh-git-sidebar/main/market/index.json
+https://hennychen.github.io/dsh-git-sidebar/market/index.json
 ```
 
 添加：**设置 → 插件 → 实验性插件 → 更多 → 打开「自定义插件市场」**，然后在 **发现 → 添加索引源** 粘贴上面的 URL。安装确认框会显示 Git 来源（`hennychen/dsh-git-sidebar`）与固定提交。
@@ -26,7 +26,7 @@ https://raw.githubusercontent.com/hennychen/dsh-git-sidebar/main/market/index.js
 
 | 规则 | 本仓库的实现 |
 | --- | --- |
-| `format: 1`，UTF-8 JSON，静态 https，2xx 无重定向 | `market/index.json`，经 `raw.githubusercontent.com`（https） |
+| `format: 1`，UTF-8 JSON，静态 https，2xx 无重定向 | `docs/market/index.json`，经 GitHub Pages（`https://hennychen.github.io`） |
 | 每个版本声明 `dsh.bundle` | 每个列出的 tag 的 `package.json` 都有 `dsh.bundle.patch` |
 | 每个版本 `engines.dsh` 非空且从该版本 manifest 原样复制 | 声明为 `>=0.2.0-rc.2 <0.3.0`，由生成器从 tag 的 manifest 读取 |
 | `publishTimestamp` 为该提交的 committer 时间（秒） | 生成器用 `git log -1 --format=%ct <commit>` |
@@ -40,7 +40,7 @@ https://raw.githubusercontent.com/hennychen/dsh-git-sidebar/main/market/index.js
 ```bash
 git tag v0.6.4            # 先给含 engines.dsh 的版本打 tag
 node scripts/market-index.mjs
-git add market && git commit -m "chore: update market index"
+git add docs/market && git commit -m "chore: update market index"
 ```
 
 > 生成器会跳过不满足 `dsh.bundle` + `engines.dsh` 的 tag（本仓库 `v0.6.1`–`v0.6.3` 即为这种情况），因此索引只列出 `v0.6.4` 及之后的版本。

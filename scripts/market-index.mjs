@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Build a plugin-market index (format 1) for this repository.
+// Build a plugin-market index (format 1) for this repository (served from docs/ by GitHub Pages).
 //
 // Rules implemented here follow DSH's official plugin-market index format:
 //   - format 1, UTF-8 JSON
@@ -18,7 +18,7 @@ import { fileURLToPath } from 'node:url'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const repoRoot = resolve(here, '..')
-const outDir = join(repoRoot, 'market')
+const outDir = join(repoRoot, 'docs', 'market')
 const iconsDir = join(outDir, 'icons')
 
 const git = (args) => execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8' }).trim()
