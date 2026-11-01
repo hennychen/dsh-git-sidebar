@@ -1,0 +1,49 @@
+{
+  "name": "dsh-git-sidebar",
+  "version": "0.6.1",
+  "private": true,
+  "description": "VS Code Source Control style multi-repository Git panel for the DeepSeek Harness right sidebar: repositories list with branch/ahead-behind/sync, changes with staging and commit, commit graph.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "icon": "icon.svg",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hennychen/dsh-git-sidebar.git"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "git",
+    "source-control",
+    "vscode",
+    "sidebar"
+  ],
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "README.md"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-sidebar-right"
+      ]
+    }
+  }
+}

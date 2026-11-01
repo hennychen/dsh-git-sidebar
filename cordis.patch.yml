@@ -1,0 +1,6 @@
+# dsh-git-sidebar — mounts the right-sidebar Git panel.
+# Host half: index.js (git JSON API under /git-sidebar).
+# Client half: client.js (right-sidebar tab type + panel body).
+- insert:
+    - id: git-sidebar
+      name: 'dsh-git-sidebar'

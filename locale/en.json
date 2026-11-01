@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Git Source Control",
+    "description": "VS Code style multi-repository Source Control in the right sidebar: repositories with branch/ahead-behind/sync, changes with staging and commit, and the commit graph."
+  }
+}
