@@ -38,7 +38,8 @@
     "locale/*.json",
     "icon.svg",
     "README.md",
-    "docs/panel.png"
+    "docs/panel.png",
+    "docs/cover.png"
   ],
   "dsh": {
     "bundle": {

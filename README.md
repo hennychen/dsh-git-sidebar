@@ -1,6 +1,10 @@
 # dsh-git-sidebar
 
+![dsh-git-sidebar 封面](docs/cover.png)
+
 VS Code **Source Control** 风格的 Git 面板，装在 DeepSeek Harness 桌面端 Web GUI 的**右侧边栏**里。
+
+> 封面与预览图由 `scripts/make-cover.py`（Pillow）生成；GitHub 社交预览需在仓库 Settings → Social preview 手动上传 `docs/cover.png`。
 
 ## 预览
 
