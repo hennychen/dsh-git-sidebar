@@ -1,0 +1,66 @@
+{
+  "format": 1,
+  "title": {
+    "en": "Git Sidebar Market",
+    "zh": "Git Sidebar 插件市场"
+  },
+  "description": {
+    "en": "Plugin index for dsh-git-sidebar: a VS Code style multi-repository Source Control panel for the DeepSeek Harness right sidebar.",
+    "zh": "dsh-git-sidebar 的插件索引：DeepSeek Harness 右侧边栏的 VS Code 式多存储库源代码管理面板。"
+  },
+  "metadata": {
+    "categories": {
+      "development": {
+        "title": {
+          "en": "Development",
+          "zh": "开发"
+        }
+      }
+    }
+  },
+  "plugins": [
+    {
+      "name": "dsh-git-sidebar",
+      "title": {
+        "en": "Git Source Control",
+        "zh": "Git 源代码管理"
+      },
+      "description": {
+        "en": "VS Code style multi-repository Source Control in the right sidebar: repositories with branch/ahead-behind/sync, changes with staging and commit, and the commit graph.",
+        "zh": "右侧边栏的 VS Code 风格多存储库源代码管理：存储库列表（分支/领先落后/同步）、更改暂存与提交、提交图形。"
+      },
+      "icon": "icons/dsh-git-sidebar.svg",
+      "author": "hennychen",
+      "homepage": "https://github.com/hennychen/dsh-git-sidebar#readme",
+      "repository": {
+        "url": "https://github.com/hennychen/dsh-git-sidebar"
+      },
+      "metadata": {
+        "category": "development",
+        "keywords": [
+          "deepseek-harness",
+          "dsh",
+          "dsh-plugin",
+          "git",
+          "source-control",
+          "vscode",
+          "sidebar"
+        ]
+      },
+      "versions": [
+        {
+          "version": "0.6.4",
+          "publishTimestamp": 1793500813,
+          "source": {
+            "type": "git",
+            "url": "https://github.com/hennychen/dsh-git-sidebar",
+            "commit": "ee512237ad2789c25e23c445317e8710e927f1c1"
+          },
+          "engines": {
+            "dsh": ">=0.2.0-rc.2 <0.3.0"
+          }
+        }
+      ]
+    }
+  ]
+}
