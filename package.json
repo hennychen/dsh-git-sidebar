@@ -1,11 +1,13 @@
 {
   "name": "dsh-git-sidebar",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "private": true,
   "description": "VS Code Source Control style multi-repository Git panel for the DeepSeek Harness right sidebar: repositories list with branch/ahead-behind/sync, changes with staging and commit, commit graph.",
   "license": "Apache-2.0",
   "type": "module",
   "icon": "icon.svg",
+  "author": "hennychen",
+  "homepage": "https://github.com/hennychen/dsh-git-sidebar#readme",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hennychen/dsh-git-sidebar.git"
@@ -19,6 +21,9 @@
     "vscode",
     "sidebar"
   ],
+  "engines": {
+    "dsh": ">=0.2.0-rc.2 <0.3.0"
+  },
   "exports": {
     ".": "./index.js",
     "./client": "./client.js",
