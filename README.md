@@ -4,17 +4,18 @@ VS Code **Source Control** 风格的 Git 面板，装在 DeepSeek Harness 桌面
 
 ## 安装
 
-本仓库是一个 DSH profile bundle，目录可被直接挂载：
+本仓库是一个 DSH profile bundle（`dsh.bundle.patch` + `dsh.client`），右侧边栏的「源代码管理」标签由客户端半注册。
 
 ```bash
-# 方式一：命令行（pnpm link 到 profile，需在插件页启用 bundle）
-dsh plugin --profile desktop add link:/path/to/dsh-git-sidebar
-
-# 方式二：GitHub 直装（新版 dsh 的插件管理器 / 插件页）
+# 方式一：从 GitHub 安装到 profile（pnpm 拉取本仓库）
 dsh plugin --profile desktop add github:hennychen/dsh-git-sidebar
+
+# 方式二：本地开发挂载（改代码即时生效）
+dsh plugin --profile desktop add link:/path/to/dsh-git-sidebar
 ```
 
-安装后重启一次 `dsh`（或让插件管理器热加载），右侧边栏 `+` 里会出现「源代码管理」。
+安装后在 **设置 → 插件** 里确认该 bundle 已启用（也可由插件管理器的 `install_bundle` 完成注册），再重启一次 `dsh`。
+右侧边栏 `+` 里会出现「源代码管理」。
 
 ## 打开
 
