@@ -257,6 +257,9 @@ window.__ModuleLoader__.load({
 .gs-clean{display:flex;align-items:center;justify-content:center;gap:6px;margin:8px;padding:10px;border:1px dashed var(--dsw-alias-border-l1);border-radius:4px;color:var(--dsw-alias-label-secondary);font-size:11px}
 .gs-gline{display:flex;align-items:center;gap:6px;height:20px;padding:0 8px;min-width:0;font-size:11px}
 .gs-gline:hover{background:var(--dsw-alias-bg-layer-2)}
+.gs-grow{display:flex;align-items:center;gap:6px;height:20px;padding:0 8px;min-width:0;font-size:11px}
+.gs-grow:hover{background:var(--dsw-alias-bg-layer-2)}
+.gs-gsvg{flex:0 0 auto;display:block;overflow:visible}
 .gs-gart{flex:0 0 auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:10.5px;white-space:pre;color:var(--dsw-alias-label-secondary);opacity:.95}
 .gs-ghash{flex:0 0 auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:10px;color:var(--dsw-alias-brand-primary)}
 .gs-gsub{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}
@@ -374,6 +377,71 @@ window.__ModuleLoader__.load({
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(payload),
     })
+
+    const GRAPH_COLORS = ['#58a6ff', '#3fb950', '#d29922', '#bc8cff', '#f85149', '#39c5cf', '#ff7b72', '#a5d6ff']
+    const graphColor = (lane) => GRAPH_COLORS[lane % GRAPH_COLORS.length]
+
+    /** Lane layout for a linear `git log` stream with known parent hashes. */
+    function buildGraphRows(lines) {
+      const lanes = []
+      const rows = []
+      for (const line of lines) {
+        if (line.hash === '') continue
+        let lane = lanes.indexOf(line.hash)
+        if (lane < 0) {
+          lane = lanes.indexOf(null)
+          if (lane < 0) { lane = lanes.length; lanes.push(null) }
+        }
+        const before = lanes.slice()
+        const parents = line.parents || []
+        lanes[lane] = parents[0] || null
+        let insertAt = lane + 1
+        for (let index = 1; index < parents.length; index += 1) {
+          let slot = lanes.indexOf(null, insertAt)
+          if (slot < 0) { lanes.push(null); slot = lanes.length - 1 }
+          lanes[slot] = parents[index]
+          insertAt = slot + 1
+        }
+        for (let index = 0; index < lanes.length; index += 1) {
+          if (lanes[index] !== null && lanes.indexOf(lanes[index]) !== index) lanes[index] = null
+        }
+        const after = lanes.slice()
+        rows.push({ commit: line, lane, before, after, width: Math.max(before.length, after.length, lane + 1) })
+      }
+      return rows
+    }
+
+    function graphSvg(row) {
+      const laneX = (index) => index * 12 + 6
+      const parts = []
+      for (let index = 0; index < row.width; index += 1) {
+        const x = laneX(index)
+        const hasBefore = index < row.before.length && row.before[index] !== null
+        const hasAfter = index < row.after.length && row.after[index] !== null
+        if (hasBefore && hasAfter) {
+          parts.push(h('line', { key: 'v' + index, x1: x, y1: 0, x2: x, y2: 20, stroke: graphColor(index), strokeWidth: 1.4 }))
+        } else if (hasBefore) {
+          parts.push(h('line', { key: 'vb' + index, x1: x, y1: 0, x2: x, y2: 10, stroke: graphColor(index), strokeWidth: 1.4 }))
+        } else if (hasAfter) {
+          parts.push(h('line', { key: 'va' + index, x1: x, y1: 10, x2: x, y2: 20, stroke: graphColor(index), strokeWidth: 1.4 }))
+        }
+      }
+      for (let index = 1; index < (row.commit.parents || []).length; index += 1) {
+        const target = row.after.indexOf(row.commit.parents[index])
+        if (target >= 0 && target !== row.lane) {
+          parts.push(h('path', {
+            key: 'p' + index,
+            d: 'M' + laneX(row.lane) + ' 10 C ' + laneX(row.lane) + ' 16, ' + laneX(target) + ' 14, ' + laneX(target) + ' 20',
+            fill: 'none', stroke: graphColor(target), strokeWidth: 1.2,
+          }))
+        }
+      }
+      parts.push(h('circle', { key: 'node', cx: laneX(row.lane), cy: 10, r: 3.2, fill: graphColor(row.lane) }))
+      return h('svg', {
+        className: 'gs-gsvg', width: row.width * 12 + 4, height: 20,
+        viewBox: '0 0 ' + (row.width * 12 + 4) + ' 20', 'aria-hidden': true,
+      }, parts)
+    }
 
     function injectStyles() {
       if (typeof document === 'undefined') return () => {}
@@ -629,6 +697,29 @@ window.__ModuleLoader__.load({
           })
           return () => { cancelled = true }
         }, [sid, activeRepo, sections.graph, graphTick])
+
+        const graphRows = useMemo(() => buildGraphRows(graph && Array.isArray(graph.lines) ? graph.lines : []), [graph])
+
+        useEffect(() => {
+          beacon('mount', { sid })
+        }, [sid])
+
+        useEffect(() => {
+          const handle = setTimeout(() => {
+            const node = rootRef.current
+            if (node === null) { beacon('paint', { sid, missing: true }); return }
+            const rect = node.getBoundingClientRect()
+            const body = node.querySelector('.gs-body')
+            beacon('paint', {
+              sid,
+              w: Math.round(rect.width),
+              h: Math.round(rect.height),
+              text: String(node.innerText || '').slice(0, 200),
+              bodyH: body === null ? null : Math.round(body.getBoundingClientRect().height),
+            })
+          }, 300)
+          return () => clearTimeout(handle)
+        }, [loading, repos, info, sid])
 
         useEffect(() => {
           if (!menuOpen) return
@@ -1000,13 +1091,13 @@ window.__ModuleLoader__.load({
             graphOpen
               ? (graph === null || graph.root !== (activeRepo ? activeRepo.path : '')
                 ? h('div', { className: 'gs-empty' }, tr('empty.loading'))
-                : (graph.lines.length === 0
+                : (graphRows.length === 0
                   ? h('div', { className: 'gs-empty' }, tr('empty.graph'))
-                  : graph.lines.map((line, at) => h('div', { className: 'gs-gline', key: at },
-                    h('span', { className: 'gs-gart' }, line.graph || ''),
-                    line.hash ? h('span', { className: 'gs-ghash' }, line.short) : null,
-                    line.hash ? h('span', { className: 'gs-gsub', title: line.subject + ' — ' + (line.author || '') }, line.subject) : null,
-                    (line.refs || []).slice(0, 2).map((ref) => h('span', { className: 'gs-gref', key: ref }, ref))))))
+                  : graphRows.map((row, at) => h('div', { className: 'gs-grow', key: at, title: row.commit.subject + ' — ' + (row.commit.author || '') },
+                    graphSvg(row),
+                    h('span', { className: 'gs-ghash' }, row.commit.short),
+                    h('span', { className: 'gs-gsub' }, row.commit.subject),
+                    (row.commit.refs || []).slice(0, 2).map((ref) => h('span', { className: 'gs-gref', key: ref }, ref))))))
               : null)
           : null
 
@@ -1045,7 +1136,13 @@ window.__ModuleLoader__.load({
       const t = ctx.locale.bind(NS)
       const Panel = createPanel(t)
 
-      ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'git-sidebar: dictionaries')
+      try {
+        ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'git-sidebar: dictionaries')
+      } catch (error) {
+        // A hot-reloaded older instance may still hold this namespace; keep the
+        // panel usable with its already-registered copy instead of failing.
+        beacon('locale-conflict', { message: String((error && error.message) || error) })
+      }
       ctx.effect(() => injectStyles(), 'git-sidebar: styles')
 
       ctx.effect(() => {

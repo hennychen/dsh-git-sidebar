@@ -604,7 +604,7 @@ async function discoverRepos(ctx, sid) {
 async function collectGraph(root) {
   const raw = await gitOr(root, [
     'log', '--graph', '--all', '--date=unix', '-n', '80',
-    '--format=%x1f%H%x1f%h%x1f%an%x1f%at%x1f%D%x1f%s',
+    '--format=%x1f%H%x1f%P%x1f%h%x1f%an%x1f%at%x1f%D%x1f%s',
   ])
   const lines = []
   for (const line of raw.split('\n')) {
@@ -615,10 +615,11 @@ async function collectGraph(root) {
       continue
     }
     const graph = line.slice(0, marker).replace(/\s+$/, '')
-    const [hash, short, author, at, refs, subject] = line.slice(marker + 1).split('\x1f')
+    const [hash, parentsRaw, short, author, at, refs, subject] = line.slice(marker + 1).split('\x1f')
     lines.push({
       graph,
       hash: hash || '',
+      parents: parentsRaw ? parentsRaw.split(' ').filter(Boolean) : [],
       short: short || '',
       author: author || '',
       at: Number(at) * 1000 || 0,
