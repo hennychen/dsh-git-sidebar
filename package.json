@@ -1,6 +1,6 @@
 {
   "name": "dsh-git-sidebar",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "private": true,
   "description": "VS Code Source Control style multi-repository Git panel for the DeepSeek Harness right sidebar: repositories list with branch/ahead-behind/sync, changes with staging and commit, commit graph.",
   "license": "Apache-2.0",
@@ -32,7 +32,8 @@
     "cordis.patch.yml",
     "locale/*.json",
     "icon.svg",
-    "README.md"
+    "README.md",
+    "docs/panel.png"
   ],
   "dsh": {
     "bundle": {

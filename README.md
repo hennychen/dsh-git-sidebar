@@ -2,6 +2,16 @@
 
 VS Code **Source Control** 风格的 Git 面板，装在 DeepSeek Harness 桌面端 Web GUI 的**右侧边栏**里。
 
+## 预览
+
+![DeepSeek Harness 右侧边栏 · 多存储库源代码管理](docs/panel.png)
+
+面板分三段，对齐 VS Code 的 Source Control 布局：
+
+- **存储库**：自动发现会话目录、嵌套仓库与已注册工作区中的 Git 仓库；每行显示分支、领先/落后、同步与仓库菜单（获取/拉取/推送/设为当前），点分支胶囊可切换/新建分支。
+- **更改**：当前存储库（多选模式下按仓库分块）的提交框与「更改 / 暂存的更改」分组，支持逐文件暂存、取消暂存、放弃和内联 diff。
+- **图形**：提交历史与分支走向（v0.6.2 起为 SVG 车道图）。
+
 ## 安装
 
 本仓库是一个 DSH profile bundle（`dsh.bundle.patch` + `dsh.client`），右侧边栏的「源代码管理」标签由客户端半注册。
