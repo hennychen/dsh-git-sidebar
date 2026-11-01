@@ -4,7 +4,17 @@
 
 VS Code **Source Control** 风格的 Git 面板，装在 DeepSeek Harness 桌面端 Web GUI 的**右侧边栏**里。
 
-> 封面与预览图由 `scripts/make-cover.py`（Pillow）生成；GitHub 社交预览需在仓库 Settings → Social preview 手动上传 `docs/cover.png`。
+> 三张封面由 `scripts/make-cover.py`（Pillow）生成；GitHub 社交预览需在仓库 Settings → Social preview 手动上传 `docs/cover.png`（1280×640）。
+
+## 封面变体
+
+| 用途 | 文件 | 尺寸 |
+| --- | --- | --- |
+| README 横幅 / GitHub 社交预览 | [docs/cover.png](docs/cover.png) | 1280×640（16:9） |
+| 3:2 卡片（文章头图、演示） | [docs/cover-3x2.png](docs/cover-3x2.png) | 1200×800 |
+| 方形（社交头像、聊天预览） | [docs/cover-square.png](docs/cover-square.png) | 1080×1080 |
+
+三张图由 `scripts/make-cover.py` 统一生成（Pillow）：`python3 scripts/make-cover.py docs`。
 
 ## 预览
 

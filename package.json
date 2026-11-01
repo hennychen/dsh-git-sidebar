@@ -39,7 +39,9 @@
     "icon.svg",
     "README.md",
     "docs/panel.png",
-    "docs/cover.png"
+    "docs/cover.png",
+    "docs/cover-3x2.png",
+    "docs/cover-square.png"
   ],
   "dsh": {
     "bundle": {
