@@ -600,11 +600,69 @@ async function discoverRepos(ctx, sid) {
   return { ok: true, session: { directory, live }, repos: withSummary }
 }
 
-/** Commit graph lines for one repository (`git log --graph` art plus fields). */
-async function collectGraph(root) {
+/** Branch refs (local + remote) for the graph's repository/branch selector. */
+async function collectGraphBranches(root) {
   const raw = await gitOr(root, [
-    'log', '--graph', '--all', '--topo-order', '--date=unix', '-n', '80',
+    'for-each-ref',
+    '--format=%(refname)%09%(objectname)%09%(HEAD)%09%(committerdate:unix)',
+    'refs/heads', 'refs/remotes',
+  ])
+  const local = []
+  const remote = []
+  for (const line of raw.split('\n')) {
+    if (!line) continue
+    const [full, tip, headMark, at] = line.split('\t')
+    if (!full || !tip) continue
+    const isRemote = full.startsWith('refs/remotes/')
+    // `%(refname:short)` 在本地与远端同名时会退化成 `heads/x`，这里自己剥前缀，
+    // 得到的名字与 `git log --format=%D` 的装饰名一致（main / origin/main）。
+    const name = isRemote
+      ? full.slice('refs/remotes/'.length)
+      : full.slice('refs/heads/'.length)
+    // refs/remotes/<remote>/HEAD 是符号引用，不是可勾选的分支
+    if (!name || (isRemote && name.endsWith('/HEAD'))) continue
+    const entry = {
+      full,
+      name,
+      tip,
+      current: headMark === '*',
+      remote: isRemote,
+      at: Number(at) * 1000 || 0,
+    }
+    if (isRemote) remote.push(entry)
+    else local.push(entry)
+  }
+  const byName = (a, b) => a.name.localeCompare(b.name)
+  // 当前分支置顶，其余按名字排序：窄面板里勾选列表的位置才稳定
+  local.sort((a, b) => Number(b.current) - Number(a.current) || byName(a, b))
+  remote.sort(byName)
+  return local.concat(remote)
+}
+
+const GRAPH_COMMIT_LIMIT = 200
+
+/**
+ * Commit graph lines for one repository (`git log --graph` art plus fields).
+ * `refsParam` is a comma-separated list of full ref names (`refs/heads/main`,
+ * `refs/remotes/origin/main`). It is filtered against the real branch list so a
+ * crafted value can never become an unexpected `git log` argument. Empty list =
+ * all refs (`--all`), preserving the old default.
+ */
+async function collectGraph(root, refsParam = '') {
+  const branches = await collectGraphBranches(root)
+  const byFull = new Map(branches.map((branch) => [branch.full, branch]))
+  const selected = []
+  for (const item of String(refsParam || '').split(',')) {
+    const ref = item.trim()
+    if (!ref) continue
+    const branch = byFull.get(ref)
+    if (branch && !selected.includes(branch.full)) selected.push(branch.full)
+  }
+  const revs = selected.length > 0 ? selected : ['--all']
+  const raw = await gitOr(root, [
+    'log', '--graph', '--topo-order', '--date=unix', '-n', String(GRAPH_COMMIT_LIMIT),
     '--format=%x1f%H%x1f%P%x1f%h%x1f%an%x1f%at%x1f%D%x1f%s',
+    ...revs,
   ])
   const lines = []
   for (const line of raw.split('\n')) {
@@ -627,7 +685,13 @@ async function collectGraph(root) {
       subject: subject || '',
     })
   }
-  return { ok: true, lines }
+  return {
+    ok: true,
+    lines,
+    branches,
+    head: (branches.find((branch) => branch.current) || {}).name || '',
+    refs: selected,
+  }
 }
 
 /** Read and parse a bounded JSON request body. */
@@ -797,7 +861,7 @@ async function handleApi(ctx, req, url) {
 
     if (op === 'graph') {
       if (!repo.isGit) throw fail('not-a-repo', 'the selected directory is not a git work tree')
-      return collectGraph(repo.root)
+      return collectGraph(repo.root, url.searchParams.get('refs') || '')
     }
 
     if (!repo.isGit) {

@@ -1,9 +1,10 @@
-// dsh-git-sidebar — Client half (v0.6).
+// dsh-git-sidebar — Client half (v0.7).
 //
 // A VS Code Source Control style panel for the right sidebar with multiple
 // repositories: the "Repositories" list (branch, ahead/behind, sync, per-repo
 // menu), "Changes" for the selected repository (or every selected repository in
-// multi mode), and a "Graph" section backed by `git log --graph`.
+// multi mode), and a "Graph" section backed by `git log --graph` with its own
+// repository picker, branch multi-select and branch-labelled lanes.
 window.__ModuleLoader__.load({
   id: 'dsh-git-sidebar',
   factory: (require) => {
@@ -70,6 +71,20 @@ window.__ModuleLoader__.load({
       'sections.repos': '存储库',
       'sections.changes': '更改',
       'sections.graph': '图形',
+      'graph.selectRepo': '选择存储库',
+      'graph.selectBranches': '选择分支',
+      'graph.allBranches': '全部分支',
+      'graph.currentOnly': '仅当前分支',
+      'graph.localOnly': '仅本地',
+      'graph.remoteOnly': '仅远程',
+      'graph.localBranches': '本地分支',
+      'graph.remoteBranches': '远程分支',
+      'graph.noBranches': '没有可显示的分支',
+      'graph.noneSelected': '未选中分支：点上方「分支」勾选要在图形里显示的分支',
+      'graph.branchPicker': '分支',
+      'graph.branchAll': '全部',
+      'graph.focus': '只看此分支',
+      'graph.branchTip': 'tip',
       'commit.placeholder': '消息（按 ⌘Enter 提交到 {branch}）',
       'commit.noStaged': '没有已暂存的更改',
       'empty.noRepos': '没有可管理的 Git 存储库',
@@ -146,6 +161,20 @@ window.__ModuleLoader__.load({
       'sections.repos': 'Repositories',
       'sections.changes': 'Changes',
       'sections.graph': 'Graph',
+      'graph.selectRepo': 'Select Repository',
+      'graph.selectBranches': 'Select Branches',
+      'graph.allBranches': 'All branches',
+      'graph.currentOnly': 'Current branch only',
+      'graph.localOnly': 'Local only',
+      'graph.remoteOnly': 'Remote only',
+      'graph.localBranches': 'Local branches',
+      'graph.remoteBranches': 'Remote branches',
+      'graph.noBranches': 'No branches to show',
+      'graph.noneSelected': 'No branch selected: use "Branches" above to pick which refs the graph shows',
+      'graph.branchPicker': 'Branches',
+      'graph.branchAll': 'All',
+      'graph.focus': 'Show only this branch',
+      'graph.branchTip': 'tip',
       'commit.placeholder': 'Message (press ⌘Enter to commit on "{branch}")',
       'commit.noStaged': 'No staged changes',
       'empty.noRepos': 'No Git repository to manage',
@@ -264,6 +293,30 @@ window.__ModuleLoader__.load({
 .gs-ghash{flex:0 0 auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:10px;color:var(--dsw-alias-brand-primary)}
 .gs-gsub{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}
 .gs-gref{flex:0 0 auto;padding:0 4px;border-radius:6px;font-size:9.5px;color:var(--dsw-alias-brand-primary);border:1px solid var(--dsw-alias-border-l1);max-width:40%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gs-gtoolbar{display:flex;align-items:center;gap:4px;padding:0 8px 5px}
+.gs-gpick{display:inline-flex;align-items:center;gap:3px;flex:1 1 0;min-width:0;height:20px;padding:0 5px;border:1px solid var(--dsw-alias-border-l1);border-radius:4px;background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-secondary);font:inherit;font-size:10.5px;cursor:pointer;overflow:hidden}
+.gs-gpick:hover{color:var(--dsw-alias-label-primary);border-color:var(--dsw-alias-border-l2)}
+.gs-gpick-on{color:var(--dsw-alias-label-primary);border-color:var(--dsw-alias-brand-primary)}
+.gs-gpick-label{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gs-gpanel{margin:0 8px 6px;max-height:210px;overflow:auto;padding:3px;border:1px solid var(--dsw-alias-border-l1);border-radius:6px;background:var(--dsw-alias-bg-layer-1)}
+.gs-gpanel-quick{display:flex;gap:4px;padding:2px 2px 5px}
+.gs-gpanel-quick .gs-btn{flex:1 1 auto;justify-content:center;font-size:10.5px;padding:2px 6px}
+.gs-gbranch-name{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:10.5px}
+.gs-gdot{width:7px;height:7px;flex:0 0 auto;border-radius:50%}
+.gs-gbranch-head{flex:0 0 auto;font-size:9px;letter-spacing:.04em;color:var(--dsw-alias-brand-primary)}
+.gs-gbranch-tip{flex:0 0 auto;color:var(--dsw-alias-label-secondary);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:9px}
+.gs-glegend{display:flex;flex-wrap:wrap;gap:3px;padding:0 8px 5px}
+.gs-gchip{display:inline-flex;align-items:center;gap:3px;max-width:48%;padding:0 5px;height:16px;border:1px solid;border-radius:8px;background:transparent;font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:9.5px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gs-gbrow{display:flex;align-items:center;gap:2px}
+.gs-gbtoggle{flex:1 1 auto;display:flex;align-items:center;gap:4px;min-width:0;height:22px;padding:0 4px;border:none;border-radius:4px;background:transparent;color:inherit;font:inherit;cursor:pointer;text-align:left}
+.gs-gbtoggle:hover{background:var(--dsw-alias-bg-layer-2)}
+.gs-gfocus{flex:0 0 auto;width:20px;height:20px;border:1px solid var(--dsw-alias-border-l1);border-radius:4px;background:transparent;color:var(--dsw-alias-label-secondary);cursor:pointer;line-height:1;font-size:11px;padding:0}
+.gs-gfocus:hover{color:var(--dsw-alias-label-primary);border-color:var(--dsw-alias-border-l2)}
+.gs-gdot{width:6px;height:6px;border-radius:50%;flex:0 0 auto}
+.gs-gref-head{font-weight:600}
+.gs-gref-remote{border-style:dashed}
+.gs-gref-tag{color:var(--dsw-alias-label-secondary)!important;border-color:var(--dsw-alias-border-l1)!important;background:transparent!important}
+.gs-gmore{color:var(--dsw-alias-label-secondary)!important;border-color:var(--dsw-alias-border-l1)!important}
 .gs-empty{padding:14px 12px;text-align:center;color:var(--dsw-alias-label-secondary);font-size:11.5px;line-height:1.7}
 .gs-banner{margin:6px 8px 0;padding:6px 8px;border-radius:4px;font-size:10.5px;line-height:1.45;border:1px solid var(--dsw-alias-state-error-primary);color:var(--dsw-alias-state-error-primary);word-break:break-word}
 .gs-banner-ok{border-color:var(--dsw-alias-state-success-primary);color:var(--dsw-alias-state-success-primary)}
@@ -369,7 +422,8 @@ window.__ModuleLoader__.load({
     const q = encodeURIComponent
     const apiInfo = (sid, root) => requestJson('/git-sidebar/api?op=info&sid=' + q(sid) + (root ? '&root=' + q(root) : ''), { method: 'GET' })
     const apiRepos = (sid) => requestJson('/git-sidebar/api?op=repos&sid=' + q(sid), { method: 'GET' })
-    const apiGraph = (sid, root) => requestJson('/git-sidebar/api?op=graph&sid=' + q(sid) + (root ? '&root=' + q(root) : ''), { method: 'GET' })
+    const apiGraph = (sid, root, refs) => requestJson('/git-sidebar/api?op=graph&sid=' + q(sid) + (root ? '&root=' + q(root) : '') +
+      (Array.isArray(refs) && refs.length > 0 ? '&refs=' + q(refs.join(',')) : ''), { method: 'GET' })
     const apiDiff = (sid, path, staged, root) => requestJson('/git-sidebar/api?op=diff&sid=' + q(sid) +
       '&path=' + q(path) + '&staged=' + (staged ? '1' : '0') + (root ? '&root=' + q(root) : ''), { method: 'GET' })
     const apiWrite = (payload) => requestJson('/git-sidebar/api', {
@@ -380,6 +434,38 @@ window.__ModuleLoader__.load({
 
     const GRAPH_COLORS = ['#58a6ff', '#3fb950', '#d29922', '#bc8cff', '#f85149', '#39c5cf', '#ff7b72', '#a5d6ff']
     const graphColor = (lane) => GRAPH_COLORS[lane % GRAPH_COLORS.length]
+
+    /** Stable colour per branch name, so a graph chip and its selector row share one colour. */
+    function branchColor(name) {
+      const text = String(name || '')
+      let hash = 0
+      for (let index = 0; index < text.length; index += 1) {
+        hash = (hash * 31 + text.charCodeAt(index)) >>> 0
+      }
+      return GRAPH_COLORS[hash % GRAPH_COLORS.length]
+    }
+
+    /** `%D` decoration -> display text, chip kind, and the branch record it names. */
+    function decorateGraphRef(ref, branchByName) {
+      let text = String(ref || '')
+      let kind = 'ref'
+      if (text.startsWith('HEAD -> ')) {
+        text = text.slice('HEAD -> '.length)
+        kind = 'head'
+      } else if (text === 'HEAD') {
+        kind = 'head'
+      } else if (text.startsWith('tag: ')) {
+        text = text.slice('tag: '.length)
+        kind = 'tag'
+      }
+      const branch = (branchByName && branchByName.get(text)) || null
+      if (branch) {
+        if (branch.current) kind = 'head'
+        else if (branch.remote) kind = 'remote'
+        else kind = 'local'
+      }
+      return { text, kind, branch }
+    }
 
     /** Lane layout plus parent/child edges for a `git log --topo-order` stream. */
     function buildGraphRows(lines) {
@@ -472,10 +558,15 @@ window.__ModuleLoader__.load({
           }))
         }
       }
+      const isMerge = (row.commit.parents || []).length > 1
       parts.push(h('circle', {
-        key: 'node', cx: laneX(row.lane), cy, r: 3.4,
-        fill: graphColor(row.lane), stroke: 'var(--dsw-alias-bg-base)', strokeWidth: 1,
+        key: 'node', cx: laneX(row.lane), cy, r: isMerge ? 4.8 : 3.4,
+        fill: isMerge ? 'var(--dsw-alias-bg-base)' : graphColor(row.lane),
+        stroke: graphColor(row.lane), strokeWidth: isMerge ? 2 : 1,
       }))
+      if (isMerge) {
+        parts.push(h('circle', { key: 'node-core', cx: laneX(row.lane), cy, r: 1.7, fill: graphColor(row.lane) }))
+      }
       const width = data.laneCount * 12 + 4
       return h('svg', {
         className: 'gs-gsvg', width, height: GRAPH_ROW, viewBox: '0 0 ' + width + ' ' + GRAPH_ROW, 'aria-hidden': true,
@@ -586,6 +677,12 @@ window.__ModuleLoader__.load({
         const [branchDraft, setBranchDraft] = useState('')
         const [graphOpen, setGraphOpen] = useState(true)
         const [graphTick, setGraphTick] = useState(0)
+        /** root -> selected full ref names (`[]` = none, missing = all branches) */
+        const [graphRefs, setGraphRefs] = useState({})
+        /** root -> branch list from the last graph response, so the picker survives repo switches */
+        const [branchCache, setBranchCache] = useState({})
+        /** '' | 'repo' | 'branch' — which inline picker below the graph header is open */
+        const [graphMenu, setGraphMenu] = useState('')
         const rootRef = useRef(null)
         const menuRef = useRef(null)
         const persistKey = 'dsh-git-sidebar:v6:' + sid
@@ -606,6 +703,9 @@ window.__ModuleLoader__.load({
               })
             }
             if (Array.isArray(saved.included)) setIncluded(saved.included)
+            if (saved.graphRefs && typeof saved.graphRefs === 'object' && !Array.isArray(saved.graphRefs)) {
+              setGraphRefs(saved.graphRefs)
+            }
           }
         }, [persistKey])
 
@@ -615,6 +715,17 @@ window.__ModuleLoader__.load({
             window.localStorage.setItem(persistKey, JSON.stringify(Object.assign({}, current, patch)))
           } catch { /* ignore */ }
         }, [persistKey])
+
+        /** Persist one repository's branch selection; `null` restores "all branches". */
+        const applyGraphRefs = useCallback((root, refs) => {
+          setGraphRefs((current) => {
+            const next = Object.assign({}, current)
+            if (refs === null) delete next[root]
+            else next[root] = refs.slice()
+            persist({ graphRefs: next })
+            return next
+          })
+        }, [persist])
 
         // ---------- data loading ----------
         const refreshRepos = useCallback(async () => {
@@ -724,20 +835,64 @@ window.__ModuleLoader__.load({
           refreshMulti()
         }, [mode, refreshMulti])
 
+        // Selected refs for the active repository: missing key = all branches,
+        // [] = explicitly none, non-empty array = that exact subset.
+        const graphEntry = activeRepo ? graphRefs[activeRepo.path] : undefined
+        const graphEntryKey = !activeRepo ? '' : (Array.isArray(graphEntry) ? graphEntry.join(',') : '*all*')
+
         useEffect(() => {
           if (!sections.graph) return
           if (!activeRepo) { setGraph(null); return }
+          const entry = graphRefs[activeRepo.path]
+          const explicit = Array.isArray(entry)
+          const refs = explicit && entry.length > 0 ? entry : undefined
           let cancelled = false
-          apiGraph(sid, activeRepo.path).then((result) => {
+          apiGraph(sid, activeRepo.path, refs).then((result) => {
             if (cancelled) return
-            setGraph(result && result.ok ? { root: activeRepo.path, lines: result.lines || [] } : { root: activeRepo.path, lines: [] })
+            if (result && result.ok) {
+              const branches = Array.isArray(result.branches) ? result.branches : []
+              if (branches.length > 0) {
+                setBranchCache((current) => Object.assign({}, current, { [activeRepo.path]: branches }))
+              }
+              const valid = Array.isArray(result.refs) ? result.refs : []
+              // 保存的分支可能已被删除：按服务端回执收敛，避免勾选状态与图形不一致
+              if (explicit && entry.length > 0 && valid.join('\u0000') !== entry.join('\u0000')) {
+                applyGraphRefs(activeRepo.path, valid.length > 0 ? valid : null)
+              }
+              setGraph({
+                root: activeRepo.path,
+                lines: explicit && entry.length === 0 ? [] : (result.lines || []),
+                branches,
+                head: result.head || '',
+                refs: valid,
+              })
+            } else {
+              setGraph({ root: activeRepo.path, lines: [], branches: [], head: '', refs: [] })
+            }
           }).catch(() => {
-            if (!cancelled) setGraph({ root: activeRepo.path, lines: [] })
+            if (!cancelled) setGraph({ root: activeRepo.path, lines: [], branches: [], head: '', refs: [] })
           })
           return () => { cancelled = true }
-        }, [sid, activeRepo, sections.graph, graphTick])
+        }, [sid, activeRepo, sections.graph, graphTick, graphEntryKey, applyGraphRefs])
 
         const graphData = useMemo(() => buildGraphRows(graph && Array.isArray(graph.lines) ? graph.lines : []), [graph])
+
+        /** Branch rows for the picker; falls back to the cached list while a repo's graph reloads. */
+        const graphBranchList = useMemo(() => {
+          const root = activeRepo ? activeRepo.path : ''
+          const cached = root ? branchCache[root] : null
+          if (Array.isArray(cached) && cached.length > 0) return cached
+          return graph && graph.root === root && Array.isArray(graph.branches) ? graph.branches : []
+        }, [activeRepo, branchCache, graph])
+
+        const graphBranchByName = useMemo(() => {
+          const map = new Map()
+          for (const branch of graphBranchList) map.set(branch.name, branch)
+          return map
+        }, [graphBranchList])
+
+        const graphExplicitRefs = Array.isArray(graphEntry) ? graphEntry : null
+        const graphCurrentBranch = graphBranchList.find((branch) => branch.current) || null
 
         useEffect(() => {
           beacon('mount', { sid })
@@ -835,6 +990,7 @@ window.__ModuleLoader__.load({
           persist({ activeRoot: repo.path })
           setInfo(null)
           setGraph(null)
+          setGraphMenu('')
         }
 
         const toggleIncluded = (repo) => {
@@ -861,6 +1017,45 @@ window.__ModuleLoader__.load({
           const next = Object.assign({}, sections, { [key]: !sections[key] })
           setSections(next)
           persist({ sections: next })
+          if (key === 'graph' && sections.graph) setGraphMenu('')
+        }
+
+        // ---------- graph branch selection ----------
+
+        /** 勾选/取消一个分支；`all` 形态先物化成整份列表再取消，避免「全选却只收到一个」 */
+        const toggleGraphBranch = (branch) => {
+          if (!activeRepo) return
+          const all = graphBranchList.map((item) => item.full)
+          let next
+          if (graphExplicitRefs === null) {
+            next = all.filter((full) => full !== branch.full)
+          } else {
+            next = graphExplicitRefs.includes(branch.full)
+              ? graphExplicitRefs.filter((full) => full !== branch.full)
+              : graphExplicitRefs.concat([branch.full])
+          }
+          applyGraphRefs(activeRepo.path, next.length === all.length ? null : next)
+        }
+
+        const selectAllGraphBranches = () => {
+          if (activeRepo) applyGraphRefs(activeRepo.path, null)
+        }
+
+        const selectCurrentGraphBranch = () => {
+          if (activeRepo && graphCurrentBranch) applyGraphRefs(activeRepo.path, [graphCurrentBranch.full])
+        }
+
+        /** 只保留一个分支，用它把图形收窄到该分支的历史 */
+        const focusGraphBranch = (branch) => {
+          if (!activeRepo) return
+          applyGraphRefs(activeRepo.path, [branch.full])
+        }
+
+        /** 只看本地或只看远程：一键把另一组的 ref 全部排除，省得逐条取消 20+ 个远端分支 */
+        const selectGraphBranchKind = (remote) => {
+          if (!activeRepo) return
+          const refs = graphBranchList.filter((branch) => branch.remote === remote).map((branch) => branch.full)
+          applyGraphRefs(activeRepo.path, refs.length === graphBranchList.length ? null : refs)
         }
 
         // ---------- render pieces ----------
@@ -1116,27 +1311,179 @@ window.__ModuleLoader__.load({
             changesBody)
           : null
 
+        const toggleGraphOpen = () => {
+          if (graphOpen) setGraphMenu('')
+          setGraphOpen(!graphOpen)
+        }
+
+        const graphToolbar = graphOpen && activeRepo
+          ? h('div', { className: 'gs-gtoolbar' },
+            h('button', {
+              type: 'button',
+              className: 'gs-gpick' + (graphMenu === 'repo' ? ' gs-gpick-on' : ''),
+              title: tr('graph.selectRepo') + ': ' + activeRepo.path,
+              onClick: () => setGraphMenu(graphMenu === 'repo' ? '' : 'repo'),
+            },
+              h(Glyph, { d: ICON.repo, size: 11 }),
+              h('span', { className: 'gs-gpick-label' }, activeRepo.name),
+              h(Glyph, { d: ICON.chevronDown, size: 10 })),
+            h('button', {
+              type: 'button',
+              className: 'gs-gpick' + (graphMenu === 'branch' ? ' gs-gpick-on' : ''),
+              title: tr('graph.selectBranches') + (graphBranchList.length > 0 ? ' · ' + graphBranchList.length : ''),
+              onClick: () => setGraphMenu(graphMenu === 'branch' ? '' : 'branch'),
+            },
+              h(Glyph, { d: ICON.branch, size: 11 }),
+              h('span', { className: 'gs-gpick-label' },
+                tr('graph.branchPicker') + ' · ' + (graphBranchList.length === 0
+                  ? tr('graph.noBranches')
+                  : graphExplicitRefs === null
+                    ? tr('graph.branchAll')
+                    : graphExplicitRefs.length + '/' + graphBranchList.length)),
+              h(Glyph, { d: ICON.chevronDown, size: 10 })))
+          : null
+
+        // 存储库下拉：图形视图内直接切仓库，等价于点上方「存储库」列表
+        const graphRepoPanel = graphOpen && graphMenu === 'repo'
+          ? h('div', { className: 'gs-gpanel' },
+            sortedRepos.map((repo) => h('button', {
+              key: repo.path, type: 'button', className: 'gs-menu-item', title: repo.path,
+              onClick: () => selectRepo(repo),
+            },
+              h('span', { className: 'gs-menu-check' }, activeRepo && activeRepo.path === repo.path ? '✓' : ''),
+              h('span', { className: 'gs-gpick-label' }, repo.name),
+              h('span', { className: 'gs-ab' }, repo.branch || ''))))
+          : null
+
+        const graphLocalBranches = graphBranchList.filter((branch) => !branch.remote)
+        const graphRemoteBranches = graphBranchList.filter((branch) => branch.remote)
+
+        const graphBranchRow = (branch) => {
+          const checked = graphExplicitRefs === null || graphExplicitRefs.includes(branch.full)
+          return h('div', { key: branch.full, className: 'gs-gbrow' },
+            h('button', {
+              type: 'button', className: 'gs-gbtoggle', title: branch.full,
+              onClick: () => toggleGraphBranch(branch),
+            },
+              h('span', { className: 'gs-cb' + (checked ? ' gs-cb-on' : '') },
+                checked ? h(Glyph, { d: ICON.check, size: 9 }) : null),
+              h('span', { className: 'gs-gdot', style: { background: branchColor(branch.name) } }),
+              h('span', { className: 'gs-gbranch-name' }, branch.name),
+              branch.current ? h('span', { className: 'gs-gbranch-head' }, 'HEAD') : null,
+              h('span', { className: 'gs-gbranch-tip' }, String(branch.tip || '').slice(0, 7))),
+            h('button', {
+              type: 'button', className: 'gs-gfocus', title: tr('graph.focus'),
+              onClick: () => focusGraphBranch(branch),
+            }, '⌖'))
+        }
+
+        // 分支多选：全部 / 仅当前分支 + 本地/远程两组逐条勾选（勾选行带颜色点，与图形里的 ref 胶囊同色）
+        const graphBranchPanel = graphOpen && graphMenu === 'branch'
+          ? h('div', { className: 'gs-gpanel' },
+            h('div', { className: 'gs-gpanel-quick' },
+              h('button', {
+                type: 'button', className: 'gs-btn', disabled: graphExplicitRefs === null,
+                onClick: selectAllGraphBranches,
+              }, tr('graph.allBranches')),
+              h('button', {
+                type: 'button', className: 'gs-btn', disabled: graphCurrentBranch === null,
+                onClick: selectCurrentGraphBranch,
+              }, tr('graph.currentOnly')),
+              h('button', {
+                type: 'button', className: 'gs-btn', disabled: graphLocalBranches.length === 0,
+                onClick: () => selectGraphBranchKind(false),
+              }, tr('graph.localOnly')),
+              h('button', {
+                type: 'button', className: 'gs-btn', disabled: graphRemoteBranches.length === 0,
+                onClick: () => selectGraphBranchKind(true),
+              }, tr('graph.remoteOnly'))),
+            graphLocalBranches.length > 0
+              ? h('div', null,
+                h('div', { className: 'gs-menu-label' }, tr('graph.localBranches') + ' · ' + graphLocalBranches.length),
+                ...graphLocalBranches.map(graphBranchRow))
+              : null,
+            graphRemoteBranches.length > 0
+              ? h('div', null,
+                h('div', { className: 'gs-menu-label' }, tr('graph.remoteBranches') + ' · ' + graphRemoteBranches.length),
+                ...graphRemoteBranches.map(graphBranchRow))
+              : null)
+          : null
+
+        // 图例：当前参与绘图的每个分支一个彩色胶囊，点开可继续勾选
+        const selectedGraphBranches = graphBranchList.filter((branch) => graphExplicitRefs === null || graphExplicitRefs.includes(branch.full))
+        const graphLegend = graphOpen && activeRepo && selectedGraphBranches.length > 0
+          ? h('div', { className: 'gs-glegend' },
+            selectedGraphBranches.slice(0, 6).map((branch) => h('button', {
+              key: branch.full, type: 'button', className: 'gs-gchip',
+              style: { color: branchColor(branch.name), borderColor: branchColor(branch.name) },
+              title: branch.full,
+              onClick: () => setGraphMenu('branch'),
+            },
+              h('span', { className: 'gs-gdot', style: { background: branchColor(branch.name) } }),
+              h('span', { className: 'gs-gpick-label' }, branch.name))),
+            selectedGraphBranches.length > 6
+              ? h('span', { className: 'gs-gmore', title: selectedGraphBranches.slice(6).map((b) => b.name).join(', ') }, '+' + (selectedGraphBranches.length - 6))
+              : null)
+          : null
+
+        const graphBody = graph === null || graph.root !== (activeRepo ? activeRepo.path : '')
+          ? h('div', { className: 'gs-empty' }, tr('empty.loading'))
+          : graphExplicitRefs !== null && graphExplicitRefs.length === 0
+            ? h('div', { className: 'gs-empty' }, tr('graph.noneSelected'))
+            : graphData.rows.length === 0
+              ? h('div', { className: 'gs-empty' }, tr('empty.graph'))
+              : graphData.rows.map((row, at) => {
+                const refs = row.commit.refs || []
+                const shown = refs.slice(0, 3)
+                const extra = refs.length - shown.length
+                const when = row.commit.at ? relativeTime(tr, row.commit.at) : ''
+                return h('div', {
+                  className: 'gs-grow', key: row.commit.hash || at,
+                  title: row.commit.subject + ' — ' + (row.commit.author || '') + (when ? ' · ' + when : ''),
+                },
+                  graphSvg(graphData, at),
+                  h('span', { className: 'gs-ghash' }, row.commit.short),
+                  h('span', { className: 'gs-gsub' }, row.commit.subject),
+                  shown.map((ref) => {
+                    const info = decorateGraphRef(ref, graphBranchByName)
+                    const color = info.branch ? branchColor(info.branch.name) : ''
+                    const style = color
+                      ? {
+                        color: info.kind === 'head' ? '#fff' : color,
+                        borderColor: color,
+                        background: info.kind === 'head' ? color : 'transparent',
+                      }
+                      : undefined
+                    return h('span', {
+                      key: ref,
+                      className: 'gs-gref gs-gref-' + info.kind,
+                      style,
+                      title: info.kind === 'head' ? 'HEAD → ' + info.text : ref,
+                    }, info.text)
+                  }),
+                  extra > 0
+                    ? h('span', { className: 'gs-gmore', title: refs.slice(3).join(', ') }, '+' + extra)
+                    : null)
+              })
+
         const graphSection = sections.graph
           ? h('div', { className: 'gs-group', key: 'graph' },
             h('div', { className: 'gs-group-head' },
               h('button', {
                 type: 'button', className: 'gs-ibtn', style: { width: '16px', height: '16px' }, title: tr('section.graph'),
-                onClick: () => setGraphOpen((open) => !open),
+                onClick: toggleGraphOpen,
               }, h(Glyph, { d: graphOpen ? ICON.chevronDown : ICON.chevronRight, size: 12 })),
-              h('span', { className: 'gs-group-title', onClick: () => setGraphOpen((open) => !open) }, tr('section.graph')),
+              h('span', { className: 'gs-group-title', onClick: toggleGraphOpen }, tr('section.graph')),
               h('span', { className: 'gs-spacer' }),
               h('span', { className: 'gs-group-actions' },
                 h('span', { className: 'gs-ab' }, String(graph && graph.lines ? graph.lines.filter((line) => line.hash).length : 0)))),
             graphOpen
-              ? (graph === null || graph.root !== (activeRepo ? activeRepo.path : '')
-                ? h('div', { className: 'gs-empty' }, tr('empty.loading'))
-                : (graphData.rows.length === 0
-                  ? h('div', { className: 'gs-empty' }, tr('empty.graph'))
-                  : graphData.rows.map((row, at) => h('div', { className: 'gs-grow', key: at, title: row.commit.subject + ' — ' + (row.commit.author || '') },
-                    graphSvg(graphData, at),
-                    h('span', { className: 'gs-ghash' }, row.commit.short),
-                    h('span', { className: 'gs-gsub' }, row.commit.subject),
-                    (row.commit.refs || []).slice(0, 2).map((ref) => h('span', { className: 'gs-gref', key: ref }, ref))))))
+              ? h('div', { key: 'graph-body' },
+                graphToolbar,
+                graphRepoPanel,
+                graphBranchPanel,
+                graphLegend,
+                graphBody)
               : null)
           : null
 
