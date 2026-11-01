@@ -603,7 +603,7 @@ async function discoverRepos(ctx, sid) {
 /** Commit graph lines for one repository (`git log --graph` art plus fields). */
 async function collectGraph(root) {
   const raw = await gitOr(root, [
-    'log', '--graph', '--all', '--date=unix', '-n', '80',
+    'log', '--graph', '--all', '--topo-order', '--date=unix', '-n', '80',
     '--format=%x1f%H%x1f%P%x1f%h%x1f%an%x1f%at%x1f%D%x1f%s',
   ])
   const lines = []

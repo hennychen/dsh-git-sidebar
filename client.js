@@ -257,7 +257,7 @@ window.__ModuleLoader__.load({
 .gs-clean{display:flex;align-items:center;justify-content:center;gap:6px;margin:8px;padding:10px;border:1px dashed var(--dsw-alias-border-l1);border-radius:4px;color:var(--dsw-alias-label-secondary);font-size:11px}
 .gs-gline{display:flex;align-items:center;gap:6px;height:20px;padding:0 8px;min-width:0;font-size:11px}
 .gs-gline:hover{background:var(--dsw-alias-bg-layer-2)}
-.gs-grow{display:flex;align-items:center;gap:6px;height:20px;padding:0 8px;min-width:0;font-size:11px}
+.gs-grow{display:flex;align-items:center;gap:6px;height:22px;padding:0 8px;min-width:0;font-size:11px}
 .gs-grow:hover{background:var(--dsw-alias-bg-layer-2)}
 .gs-gsvg{flex:0 0 auto;display:block;overflow:visible}
 .gs-gart{flex:0 0 auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:10.5px;white-space:pre;color:var(--dsw-alias-label-secondary);opacity:.95}
@@ -381,7 +381,7 @@ window.__ModuleLoader__.load({
     const GRAPH_COLORS = ['#58a6ff', '#3fb950', '#d29922', '#bc8cff', '#f85149', '#39c5cf', '#ff7b72', '#a5d6ff']
     const graphColor = (lane) => GRAPH_COLORS[lane % GRAPH_COLORS.length]
 
-    /** Lane layout for a linear `git log` stream with known parent hashes. */
+    /** Lane layout plus parent/child edges for a `git log --topo-order` stream. */
     function buildGraphRows(lines) {
       const lanes = []
       const rows = []
@@ -392,7 +392,6 @@ window.__ModuleLoader__.load({
           lane = lanes.indexOf(null)
           if (lane < 0) { lane = lanes.length; lanes.push(null) }
         }
-        const before = lanes.slice()
         const parents = line.parents || []
         lanes[lane] = parents[0] || null
         let insertAt = lane + 1
@@ -405,41 +404,81 @@ window.__ModuleLoader__.load({
         for (let index = 0; index < lanes.length; index += 1) {
           if (lanes[index] !== null && lanes.indexOf(lanes[index]) !== index) lanes[index] = null
         }
-        const after = lanes.slice()
-        rows.push({ commit: line, lane, before, after, width: Math.max(before.length, after.length, lane + 1) })
+        rows.push({ commit: line, lane })
       }
-      return rows
+      const rowOf = new Map()
+      rows.forEach((row, index) => rowOf.set(row.commit.hash, index))
+      const edges = []
+      rows.forEach((row, index) => {
+        const parents = row.commit.parents || []
+        parents.forEach((parent, at) => {
+          const target = rowOf.get(parent)
+          if (target !== undefined && target > index) {
+            edges.push({ from: index, to: target, fromLane: row.lane, toLane: rows[target].lane })
+          } else if (at === 0) {
+            // The parent is older than the fetched window: draw a stub.
+            edges.push({ from: index, to: index + 1, fromLane: row.lane, toLane: row.lane, stub: true })
+          }
+        })
+      })
+      let laneCount = 1
+      for (const row of rows) laneCount = Math.max(laneCount, row.lane + 1)
+      for (const edge of edges) laneCount = Math.max(laneCount, edge.fromLane + 1, edge.toLane + 1)
+      return { rows, edges, laneCount }
     }
 
-    function graphSvg(row) {
-      const laneX = (index) => index * 12 + 6
+    const GRAPH_ROW = 22
+
+    /** One graph row: the vertical rails crossing it, the connectors leaving its commit, and the node. */
+    function graphSvg(data, index) {
+      const row = data.rows[index]
+      const laneX = (lane) => lane * 12 + 6
+      const cy = GRAPH_ROW / 2
       const parts = []
-      for (let index = 0; index < row.width; index += 1) {
-        const x = laneX(index)
-        const hasBefore = index < row.before.length && row.before[index] !== null
-        const hasAfter = index < row.after.length && row.after[index] !== null
-        if (hasBefore && hasAfter) {
-          parts.push(h('line', { key: 'v' + index, x1: x, y1: 0, x2: x, y2: 20, stroke: graphColor(index), strokeWidth: 1.4 }))
-        } else if (hasBefore) {
-          parts.push(h('line', { key: 'vb' + index, x1: x, y1: 0, x2: x, y2: 10, stroke: graphColor(index), strokeWidth: 1.4 }))
-        } else if (hasAfter) {
-          parts.push(h('line', { key: 'va' + index, x1: x, y1: 10, x2: x, y2: 20, stroke: graphColor(index), strokeWidth: 1.4 }))
-        }
-      }
-      for (let index = 1; index < (row.commit.parents || []).length; index += 1) {
-        const target = row.after.indexOf(row.commit.parents[index])
-        if (target >= 0 && target !== row.lane) {
-          parts.push(h('path', {
-            key: 'p' + index,
-            d: 'M' + laneX(row.lane) + ' 10 C ' + laneX(row.lane) + ' 16, ' + laneX(target) + ' 14, ' + laneX(target) + ' 20',
-            fill: 'none', stroke: graphColor(target), strokeWidth: 1.2,
+      const rails = new Set()
+      for (const edge of data.edges) {
+        if (edge.from < index && index <= edge.to) {
+          const key = 'v' + edge.toLane
+          if (rails.has(key)) continue
+          rails.add(key)
+          parts.push(h('line', {
+            key, x1: laneX(edge.toLane), y1: 0, x2: laneX(edge.toLane), y2: GRAPH_ROW,
+            stroke: graphColor(edge.toLane), strokeWidth: 1.5,
           }))
         }
       }
-      parts.push(h('circle', { key: 'node', cx: laneX(row.lane), cy: 10, r: 3.2, fill: graphColor(row.lane) }))
+      for (const edge of data.edges) {
+        if (edge.from !== index) continue
+        if (edge.stub === true) {
+          parts.push(h('line', {
+            key: 's' + edge.fromLane, x1: laneX(edge.fromLane), y1: cy, x2: laneX(edge.fromLane), y2: GRAPH_ROW,
+            stroke: graphColor(edge.fromLane), strokeWidth: 1.5,
+          }))
+          continue
+        }
+        if (edge.toLane !== edge.fromLane) {
+          const x0 = laneX(edge.fromLane)
+          const x1 = laneX(edge.toLane)
+          parts.push(h('path', {
+            key: 'c' + index + ':' + edge.fromLane + ':' + edge.toLane + ':' + edge.to,
+            d: 'M' + x0 + ' ' + cy + ' L' + x0 + ' ' + (cy + 4) + ' L' + x1 + ' ' + GRAPH_ROW,
+            fill: 'none', stroke: graphColor(edge.toLane), strokeWidth: 1.5, strokeLinejoin: 'round',
+          }))
+        } else {
+          parts.push(h('line', {
+            key: 'c' + index + ':' + edge.to,
+            x1: laneX(edge.fromLane), y1: cy, x2: laneX(edge.fromLane), y2: GRAPH_ROW,
+            stroke: graphColor(edge.fromLane), strokeWidth: 1.5,
+          }))
+        }
+      }
+      parts.push(h('circle', {
+        key: 'node', cx: laneX(row.lane), cy, r: 3.4,
+        fill: graphColor(row.lane), stroke: 'var(--dsw-alias-bg-base)', strokeWidth: 1,
+      }))
+      const width = data.laneCount * 12 + 4
       return h('svg', {
-        className: 'gs-gsvg', width: row.width * 12 + 4, height: 20,
-        viewBox: '0 0 ' + (row.width * 12 + 4) + ' 20', 'aria-hidden': true,
+        className: 'gs-gsvg', width, height: GRAPH_ROW, viewBox: '0 0 ' + width + ' ' + GRAPH_ROW, 'aria-hidden': true,
       }, parts)
     }
 
@@ -698,7 +737,7 @@ window.__ModuleLoader__.load({
           return () => { cancelled = true }
         }, [sid, activeRepo, sections.graph, graphTick])
 
-        const graphRows = useMemo(() => buildGraphRows(graph && Array.isArray(graph.lines) ? graph.lines : []), [graph])
+        const graphData = useMemo(() => buildGraphRows(graph && Array.isArray(graph.lines) ? graph.lines : []), [graph])
 
         useEffect(() => {
           beacon('mount', { sid })
@@ -1091,10 +1130,10 @@ window.__ModuleLoader__.load({
             graphOpen
               ? (graph === null || graph.root !== (activeRepo ? activeRepo.path : '')
                 ? h('div', { className: 'gs-empty' }, tr('empty.loading'))
-                : (graphRows.length === 0
+                : (graphData.rows.length === 0
                   ? h('div', { className: 'gs-empty' }, tr('empty.graph'))
-                  : graphRows.map((row, at) => h('div', { className: 'gs-grow', key: at, title: row.commit.subject + ' — ' + (row.commit.author || '') },
-                    graphSvg(row),
+                  : graphData.rows.map((row, at) => h('div', { className: 'gs-grow', key: at, title: row.commit.subject + ' — ' + (row.commit.author || '') },
+                    graphSvg(graphData, at),
                     h('span', { className: 'gs-ghash' }, row.commit.short),
                     h('span', { className: 'gs-gsub' }, row.commit.subject),
                     (row.commit.refs || []).slice(0, 2).map((ref) => h('span', { className: 'gs-gref', key: ref }, ref))))))
