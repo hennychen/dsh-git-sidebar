@@ -1,6 +1,6 @@
 {
   "name": "dsh-git-sidebar",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "private": true,
   "description": "VS Code Source Control style multi-repository Git panel for the DeepSeek Harness right sidebar: repositories list with branch/ahead-behind/sync, changes with staging and commit, commit graph with repository picker and branch multi-select.",
   "license": "Apache-2.0",

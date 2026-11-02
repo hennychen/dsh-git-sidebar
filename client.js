@@ -676,6 +676,8 @@ window.__ModuleLoader__.load({
         const [branchForm, setBranchForm] = useState(false)
         const [branchDraft, setBranchDraft] = useState('')
         const [graphOpen, setGraphOpen] = useState(true)
+        const [reposOpen, setReposOpen] = useState(true)
+        const [changesOpen, setChangesOpen] = useState(true)
         const [graphTick, setGraphTick] = useState(0)
         /** root -> selected full ref names (`[]` = none, missing = all branches) */
         const [graphRefs, setGraphRefs] = useState({})
@@ -1059,12 +1061,14 @@ window.__ModuleLoader__.load({
         }
 
         // ---------- render pieces ----------
-        const sectionHead = (key, title, count, actions) => h('div', { className: 'gs-group-head' },
+        // `open` is the section's collapse state; the ⋯ menu still owns whether the
+        // whole section is shown at all (`sections.*`), so collapsing must not hide the header.
+        const sectionHead = (key, title, count, actions, open, onToggle) => h('div', { className: 'gs-group-head' },
           h('button', {
             type: 'button', className: 'gs-ibtn', style: { width: '16px', height: '16px' },
-            title: title, onClick: () => toggleSection(key),
-          }, h(Glyph, { d: sections[key] ? ICON.chevronDown : ICON.chevronRight, size: 12 })),
-          h('span', { className: 'gs-group-title', onClick: () => toggleSection(key) }, title,
+            title, onClick: onToggle,
+          }, h(Glyph, { d: open ? ICON.chevronDown : ICON.chevronRight, size: 12 })),
+          h('span', { className: 'gs-group-title', onClick: onToggle }, title,
             h('span', { className: 'gs-count' }, String(count))),
           h('span', { className: 'gs-group-actions' }, actions || null))
 
@@ -1269,12 +1273,15 @@ window.__ModuleLoader__.load({
         const reposSection = sections.repos
           ? h('div', { className: 'gs-group', key: 'repos' },
             sectionHead('repos', tr('section.repos'), (repos || []).length,
-              iconButton('refresh', tr('action.refresh'), refreshRepos, busy)),
-            loading && repos === null
-              ? h('div', { className: 'gs-empty' }, tr('empty.loading'))
-              : (repos || []).length === 0
-                ? h('div', { className: 'gs-empty' }, reposError || tr('empty.noRepos'))
-                : sortedRepos.map(repoRow))
+              iconButton('refresh', tr('action.refresh'), refreshRepos, busy),
+              reposOpen, () => setReposOpen((open) => !open)),
+            reposOpen
+              ? (loading && repos === null
+                ? h('div', { className: 'gs-empty' }, tr('empty.loading'))
+                : (repos || []).length === 0
+                  ? h('div', { className: 'gs-empty' }, reposError || tr('empty.noRepos'))
+                  : sortedRepos.map(repoRow))
+              : null)
           : null
 
         let changesBody = null
@@ -1307,8 +1314,9 @@ window.__ModuleLoader__.load({
             sectionHead('changes', tr('section.changes'),
               mode === 'multiple'
                 ? Object.keys(multi).reduce((sum, root) => sum + ((multi[root] && multi[root].counts) ? multi[root].counts.total : 0), 0)
-                : (info && info.counts ? info.counts.total : 0)),
-            changesBody)
+                : (info && info.counts ? info.counts.total : 0),
+              null, changesOpen, () => setChangesOpen((open) => !open)),
+            changesOpen ? changesBody : null)
           : null
 
         const toggleGraphOpen = () => {
