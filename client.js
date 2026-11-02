@@ -698,10 +698,14 @@ window.__ModuleLoader__.load({
             if (saved.mode === 'single' || saved.mode === 'multiple') setMode(saved.mode)
             if (typeof saved.sort === 'string') setSort(saved.sort)
             if (saved.sections && typeof saved.sections === 'object') {
+              // Older builds wrote `sections.* = false` when a section header was
+              // collapsed, which hid the section for good. Until a build with the
+              // fixed semantics re-saves these flags, treat them as visible.
+              const migrated = saved.sectionsV2 === true
               setSections({
-                repos: saved.sections.repos !== false,
-                changes: saved.sections.changes !== false,
-                graph: saved.sections.graph !== false,
+                repos: migrated ? saved.sections.repos !== false : true,
+                changes: migrated ? saved.sections.changes !== false : true,
+                graph: migrated ? saved.sections.graph !== false : true,
               })
             }
             if (Array.isArray(saved.included)) setIncluded(saved.included)
@@ -1018,7 +1022,7 @@ window.__ModuleLoader__.load({
         const toggleSection = (key) => {
           const next = Object.assign({}, sections, { [key]: !sections[key] })
           setSections(next)
-          persist({ sections: next })
+          persist({ sections: next, sectionsV2: true })
           if (key === 'graph' && sections.graph) setGraphMenu('')
         }
 
