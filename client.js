@@ -248,6 +248,10 @@ window.__ModuleLoader__.load({
 .gs-menu-item{display:flex;width:100%;align-items:center;gap:8px;padding:4px 8px;border:none;border-radius:4px;background:transparent;color:var(--dsw-alias-label-primary);font:inherit;font-size:11.5px;text-align:left;cursor:pointer}
 .gs-menu-item:hover{background:var(--dsw-alias-bg-layer-2)}
 .gs-menu-check{width:12px;flex:0 0 auto;color:var(--dsw-alias-brand-primary);font-size:10px}
+.gs-menu-scroll{max-height:min(260px,60vh);overflow-y:auto;scrollbar-width:thin;overscroll-behavior:contain}
+.gs-menu-scroll::-webkit-scrollbar{width:6px}
+.gs-menu-scroll::-webkit-scrollbar-thumb{background:var(--dsw-alias-border-l2);border-radius:3px}
+.gs-menu-scroll::-webkit-scrollbar-track{background:transparent}
 .gs-menu-sep{height:1px;margin:3px 4px;background:var(--dsw-alias-border-l1)}
 .gs-sub{display:flex;flex-direction:column;margin-top:2px}
 .gs-sub-head{display:flex;align-items:center;gap:5px;padding:4px 8px 2px;font-size:11px;color:var(--dsw-alias-label-secondary);min-width:0}
@@ -1111,16 +1115,17 @@ window.__ModuleLoader__.load({
             ),
             branchMenu === repo.path && on && info && info.isGit && info.repo && info.repo.root === repo.path
               ? h('div', { className: 'gs-row-menu' },
-                h('div', { className: 'gs-menu-label' }, tr('action.branches')),
-                (info.branches || []).slice(0, 12).map((branch) => h('button', {
-                  key: branch.name, type: 'button', className: 'gs-menu-item',
-                  onClick: () => {
-                    setBranchMenu('')
-                    if (branch.current) return
-                    if (typeof window !== 'undefined' && !window.confirm(tr('confirm.checkout') + '\n' + branch.name)) return
-                    act(repo.path, 'checkout', { branch: branch.name })
-                  },
-                }, h('span', { className: 'gs-menu-check' }, branch.current ? '✓' : ''), branch.name)),
+                h('div', { className: 'gs-menu-label' }, tr('action.branches') + ((info.branches || []).length > 0 ? ' · ' + info.branches.length : '')),
+                h('div', { className: 'gs-menu-scroll' },
+                  (info.branches || []).map((branch) => h('button', {
+                    key: branch.name, type: 'button', className: 'gs-menu-item',
+                    onClick: () => {
+                      setBranchMenu('')
+                      if (branch.current) return
+                      if (typeof window !== 'undefined' && !window.confirm(tr('confirm.checkout') + '\n' + branch.name)) return
+                      act(repo.path, 'checkout', { branch: branch.name })
+                    },
+                  }, h('span', { className: 'gs-menu-check' }, branch.current ? '✓' : ''), branch.name))),
                 h('div', { className: 'gs-menu-sep' }),
                 branchForm
                   ? h('div', { className: 'gs-branch-form' },
