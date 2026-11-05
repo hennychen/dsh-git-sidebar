@@ -81,6 +81,23 @@ window.__ModuleLoader__.load({
       'graph.remoteBranches': '远程分支',
       'graph.noBranches': '没有可显示的分支',
       'graph.noneSelected': '未选中分支：点上方「分支」勾选要在图形里显示的分支',
+      'git.pull': '拉取', 'git.push': '推送', 'git.clone': '克隆…', 'git.checkout': '签出到…',
+      'git.fetch': '抓取', 'git.sync': '同步', 'git.output': '显示 GIT 输出',
+      'git.commitGroup': '提交', 'git.commitStaged': '提交已暂存', 'git.commitAll': '提交全部更改',
+      'git.changesGroup': '更改', 'git.stageAll': '暂存全部更改', 'git.unstageAll': '取消暂存全部更改', 'git.discardAll': '放弃全部更改',
+      'git.pullPushGroup': '拉取、推送',
+      'git.branchGroup': '分支', 'git.newBranch': '新建分支…', 'git.deleteBranch': '删除分支',
+      'git.remoteGroup': '远程', 'git.noRemotes': '无远程',
+      'git.stashGroup': '存储', 'git.stashPush': '储藏当前改动', 'git.stashPop': '弹出最近储藏', 'git.stashDrop': '删除此储藏', 'git.noStashes': '无储藏',
+      'git.tagGroup': '标记', 'git.tagCreate': '创建标记…', 'git.tagDelete': '删除此标记', 'git.noTags': '无标记',
+      'git.worktreeGroup': '工作树', 'git.worktreeAdd': '新建工作树…', 'git.noWorktrees': '无工作树',
+      'view.tree': '树结构查看', 'view.list': '列表查看', 'view.sortGroup': '查看和排序',
+      'view.sortPath': '按路径排序', 'view.sortName': '按名称排序', 'view.sortStatus': '按状态排序',
+      'dialog.tagName': '标记名', 'dialog.branchName': '分支名', 'dialog.worktreePath': '工作树路径（相对仓库）',
+      'dialog.cloneUrl': '仓库 URL', 'dialog.cloneDir': '目标目录（绝对路径）',
+      'dialog.commitMsg': '提交信息', 'dialog.cancel': '取消', 'dialog.ok': '确定',
+      'output.title': 'GIT 输出', 'output.empty': '暂无输出记录',
+      'confirm.deleteBranch': '删除此分支？此操作不可撤销。', 'confirm.tagDelete': '删除此标记？', 'confirm.stashDrop': '删除此储藏？',
       'graph.branchPicker': '分支',
       'graph.branchAll': '全部',
       'graph.focus': '只看此分支',
@@ -171,6 +188,23 @@ window.__ModuleLoader__.load({
       'graph.remoteBranches': 'Remote branches',
       'graph.noBranches': 'No branches to show',
       'graph.noneSelected': 'No branch selected: use "Branches" above to pick which refs the graph shows',
+      'git.pull': 'Pull', 'git.push': 'Push', 'git.clone': 'Clone…', 'git.checkout': 'Checkout to…',
+      'git.fetch': 'Fetch', 'git.sync': 'Sync', 'git.output': 'Show GIT Output',
+      'git.commitGroup': 'Commit', 'git.commitStaged': 'Commit Staged', 'git.commitAll': 'Commit All Changes',
+      'git.changesGroup': 'Changes', 'git.stageAll': 'Stage All Changes', 'git.unstageAll': 'Unstage All Changes', 'git.discardAll': 'Discard All Changes',
+      'git.pullPushGroup': 'Pull & Push',
+      'git.branchGroup': 'Branch', 'git.newBranch': 'Create Branch…', 'git.deleteBranch': 'Delete Branch',
+      'git.remoteGroup': 'Remote', 'git.noRemotes': 'No remotes',
+      'git.stashGroup': 'Stash', 'git.stashPush': 'Stash Changes', 'git.stashPop': 'Pop Latest Stash', 'git.stashDrop': 'Drop This Stash', 'git.noStashes': 'No stashes',
+      'git.tagGroup': 'Tag', 'git.tagCreate': 'Create Tag…', 'git.tagDelete': 'Delete This Tag', 'git.noTags': 'No tags',
+      'git.worktreeGroup': 'Worktree', 'git.worktreeAdd': 'Create Worktree…', 'git.noWorktrees': 'No worktrees',
+      'view.tree': 'Tree View', 'view.list': 'List View', 'view.sortGroup': 'View & Sort',
+      'view.sortPath': 'Sort by Path', 'view.sortName': 'Sort by Name', 'view.sortStatus': 'Sort by Status',
+      'dialog.tagName': 'Tag name', 'dialog.branchName': 'Branch name', 'dialog.worktreePath': 'Worktree path (relative to repo)',
+      'dialog.cloneUrl': 'Repository URL', 'dialog.cloneDir': 'Target directory (absolute path)',
+      'dialog.commitMsg': 'Commit message', 'dialog.cancel': 'Cancel', 'dialog.ok': 'OK',
+      'output.title': 'GIT Output', 'output.empty': 'No output yet',
+      'confirm.deleteBranch': 'Delete this branch? This cannot be undone.', 'confirm.tagDelete': 'Delete this tag?', 'confirm.stashDrop': 'Drop this stash?',
       'graph.branchPicker': 'Branches',
       'graph.branchAll': 'All',
       'graph.focus': 'Show only this branch',
@@ -317,6 +351,35 @@ window.__ModuleLoader__.load({
 .gs-gfocus{flex:0 0 auto;width:20px;height:20px;border:1px solid var(--dsw-alias-border-l1);border-radius:4px;background:transparent;color:var(--dsw-alias-label-secondary);cursor:pointer;line-height:1;font-size:11px;padding:0}
 .gs-gfocus:hover{color:var(--dsw-alias-label-primary);border-color:var(--dsw-alias-border-l2)}
 .gs-gdot{width:6px;height:6px;border-radius:50%;flex:0 0 auto}
+.gs-sub-trigger{display:flex;width:100%;align-items:center;gap:6px;padding:4px 8px;border:none;border-radius:4px;background:transparent;color:var(--dsw-alias-label-primary);font:inherit;font-size:11.5px;text-align:left;cursor:pointer}
+.gs-sub-trigger:hover{background:var(--dsw-alias-bg-layer-2)}
+.gs-sub-arrow{margin-left:auto;font-size:9px;color:var(--dsw-alias-label-secondary)}
+.gs-sub-items{padding-left:12px;border-left:1px solid var(--dsw-alias-border-l1);margin:1px 0 2px 6px}
+.gs-sub-items .gs-menu-item{font-size:11px;padding:3px 8px}
+.gs-danger{color:var(--dsw-alias-state-error-primary)}
+.gs-meta-line{display:flex;gap:6px;align-items:center;padding:2px 8px;font-size:10px;color:var(--dsw-alias-label-secondary);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gs-gtools{display:flex;align-items:center;gap:2px;flex:0 0 auto}
+.gs-gtool{width:20px;height:20px;padding:0;display:inline-flex;align-items:center;justify-content:center;border:none;border-radius:4px;background:transparent;color:var(--dsw-alias-label-secondary);line-height:1;cursor:pointer}
+.gs-gtool:hover{background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-primary)}
+.gs-gtool:disabled{opacity:.4;cursor:default}
+.gs-dialog-overlay{position:absolute;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.45)}
+.gs-dialog{width:min(340px,90%);padding:14px;border:1px solid var(--dsw-alias-border-l2);border-radius:8px;background:var(--dsw-alias-bg-overlay);box-shadow:0 12px 40px rgba(0,0,0,.4)}
+.gs-dialog-title{font-size:12px;font-weight:600;margin-bottom:10px;color:var(--dsw-alias-label-primary)}
+.gs-dialog-field{margin-bottom:8px}
+.gs-dialog-field label{display:block;font-size:10px;color:var(--dsw-alias-label-secondary);margin-bottom:3px}
+.gs-dialog-actions{display:flex;gap:6px;justify-content:flex-end;margin-top:12px}
+.gs-output{position:absolute;inset:0;z-index:70;display:flex;flex-direction:column;background:var(--dsw-alias-bg-base)}
+.gs-output-head{display:flex;align-items:center;gap:6px;padding:6px 10px;border-bottom:1px solid var(--dsw-alias-border-l1);flex:0 0 auto}
+.gs-output-title{flex:1 1 auto;font-size:11px;font-weight:600;color:var(--dsw-alias-label-primary)}
+.gs-output-body{flex:1 1 auto;min-height:0;overflow-y:auto;padding:6px 10px}
+.gs-output-entry{margin-bottom:8px;border:1px solid var(--dsw-alias-border-l1);border-radius:6px;padding:6px 8px;background:var(--dsw-alias-bg-layer-1)}
+.gs-output-cmd{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:10px;color:var(--dsw-alias-brand-primary);margin-bottom:3px;word-break:break-all}
+.gs-output-text{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:10px;color:var(--dsw-alias-label-secondary);white-space:pre-wrap;word-break:break-all;max-height:120px;overflow-y:auto}
+.gs-output-err{color:var(--dsw-alias-state-error-primary)}
+.gs-tree-node{padding-left:0}
+.gs-tree-dir{display:flex;align-items:center;gap:4px;height:20px;padding:0 6px 0 12px;cursor:pointer;font-size:10.5px;color:var(--dsw-alias-label-secondary)}
+.gs-tree-dir:hover{background:var(--dsw-alias-bg-layer-2)}
+.gs-tree-children{padding-left:10px}
 .gs-gref-head{font-weight:600}
 .gs-gref-remote{border-style:dashed}
 .gs-gref-tag{color:var(--dsw-alias-label-secondary)!important;border-color:var(--dsw-alias-border-l1)!important;background:transparent!important}
@@ -357,6 +420,9 @@ window.__ModuleLoader__.load({
       minus: ['M3.5 8h9'],
       undo: ['M4 6.5h5.5a3 3 0 0 1 0 6H7', 'M6.5 4L4 6.5 6.5 9'],
       check: ['M3.5 8.5l3 3 6-7'],
+      pull: ['M8 3.5v8', 'M5 8.5l3 3 3-3'],
+      push: ['M8 12.5v-8', 'M5 7l3-3 3 3'],
+      fetch: ['M12.5 8a4.5 4.5 0 1 1-2-3.7', 'M13.5 3v3.5H10'],
       chevronDown: ['M4.5 6.5L8 10l3.5-3.5'],
       chevronRight: ['M6.5 4.5L10 8l-3.5 3.5'],
     }
@@ -428,6 +494,7 @@ window.__ModuleLoader__.load({
     const apiRepos = (sid) => requestJson('/git-sidebar/api?op=repos&sid=' + q(sid), { method: 'GET' })
     const apiGraph = (sid, root, refs) => requestJson('/git-sidebar/api?op=graph&sid=' + q(sid) + (root ? '&root=' + q(root) : '') +
       (Array.isArray(refs) && refs.length > 0 ? '&refs=' + q(refs.join(',')) : ''), { method: 'GET' })
+    const apiRead = (sid, op, root) => requestJson('/git-sidebar/api?op=' + op + '&sid=' + q(sid) + (root ? '&root=' + q(root) : ''), { method: 'GET' })
     const apiDiff = (sid, path, staged, root) => requestJson('/git-sidebar/api?op=diff&sid=' + q(sid) +
       '&path=' + q(path) + '&staged=' + (staged ? '1' : '0') + (root ? '&root=' + q(root) : ''), { method: 'GET' })
     const apiWrite = (payload) => requestJson('/git-sidebar/api', {
@@ -646,6 +713,28 @@ window.__ModuleLoader__.load({
     //#endregion
 
     //#region panel
+    /** Group changed files by directory for the tree view. */
+    function TreeChanges({ root, files, fileRow, changesOpen, expandedDirs, setExpandedDirs }) {
+        const groups = new Map()
+        for (const file of files) {
+            const dir = splitPath(file.path).dir || '.'
+            if (!groups.has(dir)) groups.set(dir, [])
+            groups.get(dir).push(file)
+        }
+        const sorted = [...groups.entries()].sort((a, b) => a[0].localeCompare(b[0]))
+        return h('div', { className: 'gs-group' }, sorted.map(([dir, dirFiles]) => {
+            const open = expandedDirs[dir] !== false
+            return h('div', { key: dir, className: 'gs-tree-node' },
+                h('div', {
+                    className: 'gs-tree-dir', onClick: () => setExpandedDirs(Object.assign({}, expandedDirs, { [dir]: !open })),
+                },
+                    h('span', null, open ? '▾' : '▸'),
+                    h('span', null, dir),
+                    h('span', { style: { color: 'var(--dsw-alias-label-secondary)' } }, '(' + dirFiles.length + ')')),
+                open ? dirFiles.map((file) => fileRow(root, file, false)) : null)
+        }))
+    }
+
     function createPanel(t) {
       const iconButton = (icon, title, onClick, disabled) => h('button', {
         type: 'button', className: 'gs-ibtn', title, 'aria-label': title, disabled: disabled === true,
@@ -683,6 +772,13 @@ window.__ModuleLoader__.load({
         const [reposOpen, setReposOpen] = useState(true)
         const [changesOpen, setChangesOpen] = useState(true)
         const [graphTick, setGraphTick] = useState(0)
+        const [dialog, setDialog] = useState(null)
+        const [gitOutput, setGitOutput] = useState(null)
+        const [submenuOpen, setSubmenuOpen] = useState('')
+        const [changesView, setChangesView] = useState('flat')
+        const [changesSort, setChangesSort] = useState('path')
+        const [expandedDirs, setExpandedDirs] = useState({})
+        const [menuData, setMenuData] = useState({})
         /** root -> selected full ref names (`[]` = none, missing = all branches) */
         const [graphRefs, setGraphRefs] = useState({})
         /** root -> branch list from the last graph response, so the picker survives repo switches */
@@ -965,6 +1061,61 @@ window.__ModuleLoader__.load({
           }
         }, [sid, activeRoot, mode, refreshRepos, refreshInfo, refreshMulti, tr])
 
+        // Fetch lazy menu data (stashes/tags/worktrees/remotes) per root
+        const loadMenuData = useCallback(async (root, kind) => {
+          try {
+            const result = await apiRead(sid, kind, root)
+            if (result && result.ok) {
+              setMenuData((current) => Object.assign({}, current, { [root + ':' + kind]: result }))
+            }
+          } catch { /* best effort */ }
+        }, [sid])
+
+        // Run a write op for a root then refresh panel state
+        const runGitOp = useCallback(async (root, op, extra) => {
+          setBusy(true)
+          setError('')
+          setNotice('')
+          try {
+            const result = await apiWrite(Object.assign({ op, sid }, root ? { root } : {}, extra || {}))
+            if (result && result.ok) {
+              setNotice(tr('msg.' + op) || result.message || 'ok')
+              await refreshRepos()
+              if (root === activeRoot || !root) await refreshInfo(activeRoot)
+              if (mode === 'multiple') await refreshMulti()
+            } else if (result) {
+              setError(result.message || result.error || 'failed')
+            }
+          } catch (err) {
+            setError(String((err && err.message) || err))
+          } finally {
+            setBusy(false)
+          }
+        }, [sid, activeRoot, mode, refreshRepos, refreshInfo, refreshMulti, tr])
+
+        // Open a simple input dialog
+        const openDialog = useCallback((title, fields, submit) => {
+          setDialog({ title, fields, submit, values: fields.map((field) => field.value || '') })
+        }, [])
+
+        const submitDialog = useCallback(() => {
+          if (dialog === null) return
+          const values = {}
+          dialog.fields.forEach((field, index) => { values[field.key] = dialog.values[index] })
+          setDialog(null)
+          dialog.submit(values)
+        }, [dialog])
+
+        const showGitOutput = useCallback(async () => {
+          setGitOutput({ open: true, entries: null })
+          try {
+            const result = await apiRead(sid, 'gitlog')
+            setGitOutput({ open: true, entries: result && result.ok ? result.entries : [] })
+          } catch {
+            setGitOutput({ open: true, entries: [] })
+          }
+        }, [sid])
+
         const loadDiff = useCallback(async (root, file) => {
           const key = root + '|' + (file.staged ? 's:' : 'w:') + file.path
           setDiffs((prev) => Object.assign({}, prev, { [key]: { loading: true, lines: [], error: '' } }))
@@ -1080,6 +1231,173 @@ window.__ModuleLoader__.load({
             h('span', { className: 'gs-count' }, String(count))),
           h('span', { className: 'gs-group-actions' }, actions || null))
 
+        // ---------- rich git action menu ----------
+        const menuItem = (id, label, action, opts) => Object.assign({ id, label, action }, opts || {})
+        const menuSep = () => ({ id: 'sep-' + Math.random().toString(36).slice(2, 6), separator: true })
+
+        const buildRepoMenu = (root) => {
+          const items = []
+          items.push(menuItem('pull', tr('git.pull'), () => runGitOp(root, 'pull')))
+          items.push(menuItem('push', tr('git.push'), () => runGitOp(root, 'push')))
+          items.push(menuItem('checkout', tr('git.checkout'), () => { setRowMenu(''); setBranchMenu(root); setBranchForm(false) }))
+          items.push(menuItem('fetch', tr('git.fetch'), () => runGitOp(root, 'fetch')))
+          items.push(menuSep())
+
+          items.push({
+            id: 'commit-group', label: tr('git.commitGroup'), children: [
+              menuItem('commit-staged', tr('git.commitStaged'), () => {
+                setRowMenu('')
+                openDialog(tr('git.commitStaged'), [{ key: 'message', label: tr('dialog.commitMsg') }], (values) => {
+                  if (values.message && values.message.trim()) runGitOp(root, 'commit', { message: values.message })
+                })
+              }),
+              menuItem('commit-all', tr('git.commitAll'), () => {
+                setRowMenu('')
+                openDialog(tr('git.commitAll'), [{ key: 'message', label: tr('dialog.commitMsg') }], (values) => {
+                  if (values.message && values.message.trim()) runGitOp(root, 'commitAll', { message: values.message })
+                })
+              }),
+            ],
+          })
+
+          items.push({
+            id: 'changes-group', label: tr('git.changesGroup'), children: [
+              menuItem('stage-all', tr('git.stageAll'), () => runGitOp(root, 'stageAll')),
+              menuItem('unstage-all', tr('git.unstageAll'), () => runGitOp(root, 'unstageAll')),
+              menuItem('discard-all', tr('git.discardAll'), () => {
+                if (typeof window !== 'undefined' && !window.confirm(tr('confirm.discardAll'))) return
+                runGitOp(root, 'discardAll')
+              }, { danger: true }),
+            ],
+          })
+
+          items.push({
+            id: 'pullpush-group', label: tr('git.pullPushGroup'), children: [
+              menuItem('pp-pull', tr('git.pull'), () => runGitOp(root, 'pull')),
+              menuItem('pp-push', tr('git.push'), () => runGitOp(root, 'push')),
+              menuItem('pp-sync', tr('git.sync'), () => runGitOp(root, 'sync')),
+              menuItem('pp-fetch', tr('git.fetch'), () => runGitOp(root, 'fetch')),
+            ],
+          })
+
+          items.push({
+            id: 'branch-group', label: tr('git.branchGroup'), children: [
+              menuItem('b-checkout', tr('git.checkout'), () => { setRowMenu(''); setBranchMenu(root); setBranchForm(false) }),
+              menuItem('b-new', tr('git.newBranch'), () => { setRowMenu(''); setBranchMenu(root); setBranchForm(true) }),
+            ],
+          })
+
+          items.push({
+            id: 'remote-group', label: tr('git.remoteGroup'), children: [
+              { id: 'remote-list', placeholder: tr('git.noRemotes'), load: 'remotes', render: (remotes) => remotes.remotes.map((remote) => ({
+                id: 'remote-' + remote.name, label: remote.name, meta: true,
+                action: () => { setRowMenu(''); setNotice(remote.name + ': ' + (remote.fetch || remote.push)) },
+              })) },
+            ],
+          })
+
+          items.push({
+            id: 'stash-group', label: tr('git.stashGroup'), children: [
+              menuItem('stash-push', tr('git.stashPush'), () => runGitOp(root, 'stashPush')),
+              menuItem('stash-pop', tr('git.stashPop'), () => runGitOp(root, 'stashPop')),
+              { id: 'stash-list', placeholder: tr('git.noStashes'), load: 'stashes', render: (data) => (data.stashes || []).map((stash) => ({
+                id: 'stash-' + stash.index,
+                label: stash.ref + ' ' + String(stash.subject || '').slice(0, 40),
+                action: () => runGitOp(root, 'stashPop', { index: stash.index }),
+                deleteAction: () => {
+                  if (typeof window !== 'undefined' && !window.confirm(tr('confirm.stashDrop'))) return
+                  runGitOp(root, 'stashDrop', { index: stash.index })
+                },
+              })) },
+            ],
+          })
+
+          items.push({
+            id: 'tag-group', label: tr('git.tagGroup'), children: [
+              menuItem('tag-create', tr('git.tagCreate'), () => {
+                setRowMenu('')
+                openDialog(tr('git.tagCreate'), [{ key: 'name', label: tr('dialog.tagName') }], (values) => {
+                  if (values.name && values.name.trim()) runGitOp(root, 'tagCreate', { name: values.name.trim() })
+                })
+              }),
+              { id: 'tag-list', placeholder: tr('git.noTags'), load: 'tags', render: (data) => (data.tags || []).slice(0, 20).map((tag) => ({
+                id: 'tag-' + tag.name,
+                label: tag.name,
+                meta: true,
+                action: () => { setRowMenu(''); setNotice(tag.name + ' → ' + tag.short) },
+                deleteAction: () => {
+                  if (typeof window !== 'undefined' && !window.confirm(tr('confirm.tagDelete') + ' ' + tag.name)) return
+                  runGitOp(root, 'tagDelete', { name: tag.name })
+                },
+              })) },
+            ],
+          })
+
+          items.push({
+            id: 'worktree-group', label: tr('git.worktreeGroup'), children: [
+              { id: 'worktree-list', placeholder: tr('git.noWorktrees'), load: 'worktrees', render: (data) => (data.worktrees || []).map((worktree) => ({
+                id: 'worktree-' + worktree.path, label: worktree.branch || worktree.path, meta: true,
+                action: () => { setRowMenu(''); setNotice(worktree.path) },
+              })) },
+              menuItem('worktree-add', tr('git.worktreeAdd'), () => {
+                setRowMenu('')
+                openDialog(tr('git.worktreeAdd'), [{ key: 'path', label: tr('dialog.worktreePath') }, { key: 'branch', label: tr('dialog.branchName') }], (values) => {
+                  if (values.path && values.path.trim()) runGitOp(root, 'worktreeAdd', { path: values.path.trim(), branch: (values.branch || '').trim() })
+                })
+              }),
+            ],
+          })
+
+          items.push(menuSep())
+          items.push(menuItem('clone', tr('git.clone'), () => {
+            setRowMenu('')
+            openDialog(tr('git.clone'), [{ key: 'url', label: tr('dialog.cloneUrl') }, { key: 'dir', label: tr('dialog.cloneDir') }], (values) => {
+              if (values.url && values.dir) runGitOp(root, 'clone', { url: values.url.trim(), dir: values.dir.trim() })
+            })
+          }))
+          items.push(menuItem('output', tr('git.output'), () => { setRowMenu(''); showGitOutput() }))
+          return items
+        }
+
+        const renderMenuItems = (items, prefix) => items.map((item) => {
+          if (item.separator === true) return h('div', { key: item.id, className: 'gs-menu-sep' })
+          if (item.children !== undefined) {
+            const open = submenuOpen === (prefix || '') + item.id
+            return h('div', { key: item.id },
+              h('button', {
+                type: 'button', className: 'gs-sub-trigger',
+                onClick: () => {
+                  setSubmenuOpen(open ? '' : (prefix || '') + item.id)
+                  const lazy = item.children.find((child) => child.load !== undefined)
+                  if (lazy !== undefined && activeRepo) loadMenuData(activeRepo.path, lazy.load)
+                },
+              }, item.label, h('span', { className: 'gs-sub-arrow' }, open ? '▾' : '▸')),
+              open ? h('div', { className: 'gs-sub-items' }, renderMenuItems(item.children, (prefix || '') + item.id + '/')) : null)
+          }
+          if (item.load !== undefined) {
+            const data = activeRepo ? menuData[activeRepo.path + ':' + item.load] : null
+            if (data === undefined || data === null) {
+              return h('div', { key: item.id, className: 'gs-meta-line' }, '…')
+            }
+            const rendered = item.render(data)
+            if (rendered.length === 0) return h('div', { key: item.id, className: 'gs-meta-line' }, item.placeholder)
+            return h('div', { key: item.id }, rendered.map((child) => h('div', {
+              key: child.id, style: { display: 'flex', alignItems: 'center', gap: 2 },
+            },
+              h('button', { type: 'button', className: 'gs-menu-item', style: { flex: '1 1 auto', minWidth: 0 }, onClick: () => { setRowMenu(''); setSubmenuOpen(''); child.action() } },
+                h('span', { style: { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, child.label)),
+              child.deleteAction !== undefined ? h('button', {
+                type: 'button', className: 'gs-gtool', style: { flex: '0 0 auto', color: 'var(--dsw-alias-state-error-primary)' }, title: tr('action.discard'),
+                onClick: () => { setRowMenu(''); setSubmenuOpen(''); child.deleteAction() },
+              }, '✕') : null)))
+          }
+          return h('button', {
+            key: item.id, type: 'button',
+            className: 'gs-menu-item' + (item.danger ? ' gs-danger' : ''),
+            onClick: () => { setRowMenu(''); setSubmenuOpen(''); if (item.action) item.action() },
+          }, item.label)
+        })
+
         const repoRow = (repo) => {
           const on = activeRepo && activeRepo.path === repo.path
           const isChecked = included.includes(repo.path)
@@ -1144,15 +1462,8 @@ window.__ModuleLoader__.load({
                   : h('button', { type: 'button', className: 'gs-menu-item', onClick: () => setBranchForm(true) }, tr('action.newBranch')))
               : null,
             rowMenu === repo.path
-              ? h('div', { className: 'gs-row-menu' },
-                h('button', { type: 'button', className: 'gs-menu-item', onClick: () => { setRowMenu(''); act(repo.path, 'fetch') } }, tr('action.fetch')),
-                h('button', { type: 'button', className: 'gs-menu-item', onClick: () => { setRowMenu(''); act(repo.path, 'pull') } }, tr('action.pull')),
-                h('button', { type: 'button', className: 'gs-menu-item', onClick: () => { setRowMenu(''); act(repo.path, 'push') } }, tr('action.push')),
-                h('div', { className: 'gs-menu-sep' }),
-                h('button', {
-                  type: 'button', className: 'gs-menu-item',
-                  onClick: () => { setRowMenu(''); setActiveRoot(repo.path); persist({ activeRoot: repo.path }) },
-                }, tr('action.setActive')))
+              ? h('div', { className: 'gs-row-menu', style: { maxHeight: 'min(400px, 70vh)', overflowY: 'auto' } },
+                renderMenuItems(buildRepoMenu(repo.path), ''))
               : null)
         }
 
@@ -1313,7 +1624,13 @@ window.__ModuleLoader__.load({
         } else if (activeRepo === null) {
           changesBody = h('div', { className: 'gs-empty' }, tr('empty.noRepos'))
         } else if (info !== null && info.isGit && info.repo && info.repo.root === activeRepo.path) {
-          changesBody = h('div', { className: 'gs-sub', key: 'active' }, changesBlock(activeRepo.path, info, message, setMessage))
+          if (changesView === 'tree') {
+            changesBody = h('div', { className: 'gs-sub', key: 'active-tree' },
+              commitBox(activeRepo.path, message, setMessage, (info.counts || {}).staged || 0, info.detached ? tr('detached') : info.branch),
+              h(TreeChanges, { root: activeRepo.path, files: info.files || [], fileRow, changesOpen, expandedDirs, setExpandedDirs }))
+          } else {
+            changesBody = h('div', { className: 'gs-sub', key: 'active' }, changesBlock(activeRepo.path, info, message, setMessage))
+          }
         } else {
           changesBody = h('div', { className: 'gs-empty' }, tr('empty.loading'))
         }
@@ -1324,7 +1641,12 @@ window.__ModuleLoader__.load({
               mode === 'multiple'
                 ? Object.keys(multi).reduce((sum, root) => sum + ((multi[root] && multi[root].counts) ? multi[root].counts.total : 0), 0)
                 : (info && info.counts ? info.counts.total : 0),
-              null, changesOpen, () => setChangesOpen((open) => !open)),
+              h('span', { className: 'gs-group-actions' },
+                iconButton(changesView === 'tree' ? 'branch' : 'more', changesView === 'tree' ? tr('view.tree') : tr('view.list'),
+                  () => setChangesView((view) => view === 'tree' ? 'flat' : 'tree'), busy),
+                iconButton('more', tr('action.menu'),
+                  () => setRowMenu(activeRepo ? rowMenu === activeRepo.path ? '' : activeRepo.path : ''), busy)),
+              changesOpen, () => setChangesOpen((open) => !open)),
             changesOpen ? changesBody : null)
           : null
 
@@ -1357,7 +1679,36 @@ window.__ModuleLoader__.load({
                   : graphExplicitRefs === null
                     ? tr('graph.branchAll')
                     : graphExplicitRefs.length + '/' + graphBranchList.length)),
-              h(Glyph, { d: ICON.chevronDown, size: 10 })))
+              h(Glyph, { d: ICON.chevronDown, size: 10 })),
+            h('span', { className: 'gs-gtools' },
+              h('button', {
+                type: 'button', className: 'gs-gtool', title: tr('git.checkout'),
+                disabled: busy || !activeRepo, onClick: () => { setBranchMenu(activeRepo ? activeRepo.path : ''); setBranchForm(false) },
+              }, h(Glyph, { d: ICON.branch, size: 13 })),
+              h('button', {
+                type: 'button', className: 'gs-gtool', title: tr('git.fetch'),
+                disabled: busy || !activeRepo, onClick: () => activeRepo && runGitOp(activeRepo.path, 'fetch'),
+              }, h(Glyph, { d: ICON.fetch || ICON.sync, size: 13 })),
+              h('button', {
+                type: 'button', className: 'gs-gtool', title: tr('git.pull'),
+                disabled: busy || !activeRepo, onClick: () => activeRepo && runGitOp(activeRepo.path, 'pull'),
+              }, h(Glyph, { d: ICON.pull || ICON.sync, size: 13 })),
+              h('button', {
+                type: 'button', className: 'gs-gtool', title: tr('git.push'),
+                disabled: busy || !activeRepo, onClick: () => {
+                  if (!activeRepo) return
+                  if (typeof window !== 'undefined' && !window.confirm(tr('confirm.push'))) return
+                  runGitOp(activeRepo.path, 'push')
+                },
+              }, h(Glyph, { d: ICON.push || ICON.sync, size: 13 })),
+              h('button', {
+                type: 'button', className: 'gs-gtool', title: tr('action.refresh'),
+                disabled: busy, onClick: () => { setGraphTick((tick) => tick + 1); refreshRepos(); if (activeRepo) refreshInfo(activeRepo.path) },
+              }, h(Glyph, { d: ICON.refresh, size: 13 })),
+              h('button', {
+                type: 'button', className: 'gs-gtool', title: tr('action.menu'),
+                disabled: !activeRepo, onClick: () => setRowMenu(activeRepo ? rowMenu === activeRepo.path ? '' : activeRepo.path : ''),
+              }, h(Glyph, { d: ICON.more, size: 13 }))))
           : null
 
         // 存储库下拉：图形视图内直接切仓库，等价于点上方「存储库」列表
@@ -1504,9 +1855,51 @@ window.__ModuleLoader__.load({
               : null)
           : null
 
+        const dialogOverlay = dialog !== null
+          ? h('div', { className: 'gs-dialog-overlay', onClick: () => setDialog(null) },
+            h('div', { className: 'gs-dialog', onClick: (event) => event.stopPropagation() },
+              h('div', { className: 'gs-dialog-title' }, dialog.title),
+              dialog.fields.map((field, index) => h('div', { key: field.key, className: 'gs-dialog-field' },
+                h('label', null, field.label),
+                h('input', {
+                  className: 'gs-input-line', value: dialog.values[index] || '',
+                  onChange: (event) => {
+                    const values = dialog.values.slice()
+                    values[index] = event.target.value
+                    setDialog(Object.assign({}, dialog, { values }))
+                  },
+                  onKeyDown: (event) => { if (event.key === 'Enter') submitDialog() },
+                  autoFocus: index === 0,
+                }))),
+              h('div', { className: 'gs-dialog-actions' },
+                h('button', { type: 'button', className: 'gs-btn', onClick: () => setDialog(null) }, tr('dialog.cancel')),
+                h('button', {
+                  type: 'button', className: 'gs-btn gs-primary',
+                  disabled: dialog.values.every((value) => !value || value.trim() === ''),
+                  onClick: submitDialog,
+                }, tr('dialog.ok')))))
+          : null
+
+        const gitOutputOverlay = gitOutput !== null && gitOutput.open
+          ? h('div', { className: 'gs-output' },
+            h('div', { className: 'gs-output-head' },
+              h('span', { className: 'gs-output-title' }, tr('output.title')),
+              h('button', { type: 'button', className: 'gs-btn', onClick: () => setGitOutput(null) }, '✕')),
+            h('div', { className: 'gs-output-body' },
+              gitOutput.entries === null
+                ? h('div', { className: 'gs-empty' }, tr('empty.loading'))
+                : gitOutput.entries.length === 0
+                  ? h('div', { className: 'gs-empty' }, tr('output.empty'))
+                  : gitOutput.entries.map((entry, at) => h('div', { className: 'gs-output-entry', key: at },
+                    h('div', { className: 'gs-output-cmd' + (entry.ok ? '' : ' gs-output-err') }, entry.command + ' (' + entry.ms + 'ms)'),
+                    h('div', { className: 'gs-output-text' }, entry.output || '(empty)')))))
+          : null
+
         return shell(
           head(),
           banner,
+          gitOutputOverlay,
+          dialogOverlay,
           h('div', { className: 'gs-body' }, reposSection, changesSection, graphSection),
           h('div', { className: 'gs-foot' },
             h('button', { type: 'button', className: 'gs-btn', disabled: busy || !activeRepo, onClick: () => activeRepo && act(activeRepo.path, 'fetch') }, tr('action.fetch')),

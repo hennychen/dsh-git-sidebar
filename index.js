@@ -12,7 +12,7 @@
 // never be pointed at an arbitrary path. Every git call uses execFile with a
 // fixed argv (no shell), validated pathspecs and bounded output.
 import { execFile } from 'node:child_process'
-import { basename, join, sep } from 'node:path'
+import { basename, join, resolve, sep } from 'node:path'
 import { readFile, readdir, realpath, stat } from 'node:fs/promises'
 
 export const name = 'git-sidebar'
@@ -26,12 +26,14 @@ const MAX_MESSAGE = 5000
 const MAX_DIFF_CHARS = 300000
 const MAX_SYNTH_BYTES = 200000
 
-const READ_OPS = new Set(['info', 'diff', 'workspaces', 'client-events', 'client-asset', 'repos', 'graph'])
+const READ_OPS = new Set(['info', 'diff', 'workspaces', 'client-events', 'client-asset', 'repos', 'graph', 'gitlog', 'remotes', 'stashes', 'tags', 'worktrees'])
 const DIAG_OPS = new Set(['client-event'])
 const WRITE_OPS = new Set([
   'stage', 'unstage', 'stageAll', 'unstageAll',
   'discard', 'discardAll', 'commit',
-  'checkout', 'createBranch', 'fetch', 'pull', 'push', 'sync',
+  'checkout', 'createBranch', 'branchDelete', 'fetch', 'pull', 'push', 'sync',
+  'commitAll', 'stashPush', 'stashPop', 'stashDrop',
+  'tagCreate', 'tagDelete', 'worktreeAdd', 'clone',
 ])
 
 /** Browser-side diagnostics reported by the panel, newest last (bounded). */
@@ -61,8 +63,26 @@ function gitEnv() {
   }
 }
 
+/** Ring buffer of recent git commands and their output, for the "GIT 输出" viewer. */
+const GIT_LOG = []
+const GIT_LOG_LIMIT = 60
+
+function recordGit(cwd, args, ok, text, startedAt) {
+  const entry = {
+    at: Date.now(),
+    root: cwd,
+    command: 'git ' + args.join(' '),
+    ok: ok === true,
+    ms: Date.now() - startedAt,
+    output: String(text || '').slice(0, 4000),
+  }
+  GIT_LOG.push(entry)
+  if (GIT_LOG.length > GIT_LOG_LIMIT) GIT_LOG.shift()
+}
+
 /** Run one git command in `cwd`; rejects with the stderr text as message. */
 function git(cwd, args, timeoutMs = READ_TIMEOUT) {
+  const startedAt = Date.now()
   return new Promise((resolve, reject) => {
     execFile('git', ['-C', cwd, ...args], {
       maxBuffer: MAX_BUFFER,
@@ -72,9 +92,11 @@ function git(cwd, args, timeoutMs = READ_TIMEOUT) {
     }, (error, stdout, stderr) => {
       if (error) {
         const text = String(stderr || '').trim() || String(error.message || 'git failed')
+        recordGit(cwd, args, false, text, startedAt)
         reject(fail('git-failed', text))
         return
       }
+      recordGit(cwd, args, true, String(stdout), startedAt)
       resolve(String(stdout))
     })
   })
@@ -815,6 +837,74 @@ async function runWrite(ctx, op, payload) {
       await git(root, ['push'], NET_TIMEOUT)
       return { ok: true, message: 'synced' }
     }
+    case 'commitAll': {
+      const message = typeof payload.message === 'string' ? payload.message.trim() : ''
+      if (message === '') throw fail('empty-message', 'a commit message is required')
+      if (message.length > MAX_MESSAGE) throw fail('message-too-long', 'commit message too long')
+      await git(root, ['add', '-A', '--', '.'])
+      const output = await git(root, ['commit', '-m', message], 60000)
+      const match = /\[[^\]]+ ([0-9a-f]{7,})\]/i.exec(output)
+      return { ok: true, message: 'committed', head: match ? match[1] : '' }
+    }
+    case 'branchDelete': {
+      const branch = safeBranchName(payload.branch)
+      const current = (await gitOr(root, ['symbolic-ref', '--short', 'HEAD'])).trim()
+      if (branch === current) throw fail('cannot-delete-current', 'cannot delete the current branch')
+      await git(root, ['branch', '-D', branch], 30000)
+      return { ok: true, message: 'branch-deleted' }
+    }
+    case 'stashPush': {
+      const label = typeof payload.message === 'string' ? payload.message.trim() : ''
+      await git(root, ['stash', 'push', '-u', '-m', label || 'dsh-git-sidebar'], 60000)
+      return { ok: true, message: 'stashed' }
+    }
+    case 'stashPop': {
+      const index = Number.isInteger(payload.index) ? payload.index : 0
+      await git(root, ['stash', 'pop', `stash@{${index}}`], 60000)
+      return { ok: true, message: 'stash-popped' }
+    }
+    case 'stashDrop': {
+      const index = Number.isInteger(payload.index) ? payload.index : 0
+      await git(root, ['stash', 'drop', `stash@{${index}}`], 30000)
+      return { ok: true, message: 'stash-dropped' }
+    }
+    case 'tagCreate': {
+      const name = safeBranchName(payload.name)
+      const target = typeof payload.commit === 'string' && payload.commit.trim() !== '' ? payload.commit.trim() : 'HEAD'
+      await git(root, ['tag', name, target], 30000)
+      return { ok: true, message: 'tag-created' }
+    }
+    case 'tagDelete': {
+      const name = safeBranchName(payload.name)
+      await git(root, ['tag', '-d', name], 30000)
+      return { ok: true, message: 'tag-deleted' }
+    }
+    case 'worktreeAdd': {
+      const path = typeof payload.path === 'string' ? payload.path.trim() : ''
+      if (path === '' || path.startsWith('-') || path.includes('..')) throw fail('bad-path', 'invalid worktree path')
+      const absolute = resolve(root, path)
+      if (!absolute.startsWith(root + sep) && absolute !== root) throw fail('bad-path', 'worktree must live under the repository')
+      const branch = typeof payload.branch === 'string' && payload.branch !== '' ? safeBranchName(payload.branch) : ''
+      if (branch !== '') {
+        await git(root, ['worktree', 'add', '-b', branch, absolute], 60000)
+      } else {
+        await git(root, ['worktree', 'add', absolute], 60000)
+      }
+      return { ok: true, message: 'worktree-created', path: absolute }
+    }
+    case 'clone': {
+      const url = typeof payload.url === 'string' ? payload.url.trim() : ''
+      if (!/^https?:\/\/|^git@|^ssh:\/\//.test(url)) throw fail('bad-url', 'invalid clone URL')
+      const directory = typeof payload.dir === 'string' ? payload.dir.trim() : ''
+      if (directory === '' || directory.startsWith('-')) throw fail('bad-path', 'invalid target directory')
+      const { roots } = await allowedRoots(ctx, payload.sid)
+      const target = resolve(directory)
+      if (!roots.some((r) => target === r || target.startsWith(r + sep))) {
+        throw fail('path-outside', 'clone target must be inside a workspace')
+      }
+      await git(resolve(target, '..'), ['clone', url, target], NET_TIMEOUT * 2)
+      return { ok: true, message: 'cloned', path: target }
+    }
     default:
       throw fail('bad-op', 'unsupported operation: ' + op)
   }
@@ -862,6 +952,76 @@ async function handleApi(ctx, req, url) {
     if (op === 'graph') {
       if (!repo.isGit) throw fail('not-a-repo', 'the selected directory is not a git work tree')
       return collectGraph(repo.root, url.searchParams.get('refs') || '')
+    }
+
+    if (op === 'gitlog') {
+      return { ok: true, entries: GIT_LOG.slice().reverse() }
+    }
+
+    if (op === 'remotes') {
+      if (!repo.isGit) throw fail('not-a-repo', 'the selected directory is not a git work tree')
+      const raw = await gitOr(repo.root, ['remote', '-v'])
+      const remotes = []
+      for (const line of raw.split('\n')) {
+        if (!line.trim()) continue
+        const parts = line.split(/\s+/)
+        if (parts.length < 3) continue
+        const name = parts[0]
+        const existing = remotes.find((item) => item.name === name)
+        if (existing) existing[parts[2] === '(push)' ? 'push' : 'fetch'] = parts[1]
+        else remotes.push({ name, fetch: parts[2] === '(push)' ? '' : parts[1], push: parts[2] === '(push)' ? parts[1] : '' })
+      }
+      return { ok: true, remotes }
+    }
+
+    if (op === 'stashes') {
+      if (!repo.isGit) throw fail('not-a-repo', 'the selected directory is not a git work tree')
+      const raw = await gitOr(repo.root, ['stash', 'list', '--format=%gd%x09%ct%x09%gs'])
+      const stashes = []
+      for (const line of raw.split('\n')) {
+        if (!line.trim()) continue
+        const [ref, at, subject] = line.split('\x09')
+        const match = /stash@\{(\d+)\}/.exec(ref || '')
+        stashes.push({ ref: ref || '', index: match ? Number(match[1]) : stashes.length, at: Number(at) * 1000 || 0, subject: subject || '' })
+      }
+      return { ok: true, stashes }
+    }
+
+    if (op === 'tags') {
+      if (!repo.isGit) throw fail('not-a-repo', 'the selected directory is not a git work tree')
+      const raw = await gitOr(repo.root, ['for-each-ref', '--format=%(refname:lstrip=2)%09%(objectname:short)%09%(creatordate:unix)', 'refs/tags'])
+      const tags = []
+      for (const line of raw.split('\n')) {
+        if (!line.trim()) continue
+        const [name, short, at] = line.split('\t')
+        tags.push({ name, short: short || '', at: Number(at) * 1000 || 0 })
+      }
+      tags.sort((a, b) => b.at - a.at)
+      return { ok: true, tags }
+    }
+
+    if (op === 'worktrees') {
+      if (!repo.isGit) throw fail('not-a-repo', 'the selected directory is not a git work tree')
+      const raw = await gitOr(repo.root, ['worktree', 'list', '--porcelain'])
+      const worktrees = []
+      let current = null
+      for (const line of raw.split('\n')) {
+        if (line.startsWith('worktree ')) {
+          current = { path: line.slice('worktree '.length), branch: '', head: '', bare: false, detached: false }
+          worktrees.push(current)
+        } else if (current === null) {
+          continue
+        } else if (line.startsWith('branch ')) {
+          current.branch = line.slice('branch '.length).replace('refs/heads/', '')
+        } else if (line.startsWith('HEAD ')) {
+          current.head = line.slice('HEAD '.length)
+        } else if (line.startsWith('bare')) {
+          current.bare = true
+        } else if (line.startsWith('detached')) {
+          current.detached = true
+        }
+      }
+      return { ok: true, worktrees }
     }
 
     if (!repo.isGit) {
