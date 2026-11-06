@@ -63,6 +63,8 @@ git add docs/market && git commit -m "chore: update market index"
 
 ## 安装
 
+> npm 包 `@hennychen/dsh-git-sidebar`（准备发布），插件市场「发现」搜索 `git sidebar` 即可安装。
+
 
 本仓库是一个 DSH profile bundle（`dsh.bundle.patch` + `dsh.client`），右侧边栏的「源代码管理」标签由客户端半注册。
 

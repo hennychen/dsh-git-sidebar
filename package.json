@@ -1,7 +1,7 @@
 {
-  "name": "dsh-git-sidebar",
-  "version": "0.8.0",
-  "private": true,
+  "name": "@hennychen/dsh-git-sidebar",
+  "version": "0.8.1",
+  "private": false,
   "description": "VS Code Source Control style multi-repository Git panel for the DeepSeek Harness right sidebar: repositories list with branch/ahead-behind/sync, changes with staging and commit, commit graph with repository picker and branch multi-select.",
   "license": "Apache-2.0",
   "type": "module",
@@ -24,6 +24,10 @@
   "engines": {
     "dsh": ">=0.2.0-rc.2 <0.3.0"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "exports": {
     ".": "./index.js",
     "./client": "./client.js",
@@ -38,10 +42,7 @@
     "locale/*.json",
     "icon.svg",
     "README.md",
-    "docs/panel.png",
-    "docs/cover.png",
-    "docs/cover-3x2.png",
-    "docs/cover-square.png"
+    "LICENSE"
   ],
   "dsh": {
     "bundle": {

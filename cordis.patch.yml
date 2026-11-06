@@ -3,4 +3,4 @@
 # Client half: client.js (right-sidebar tab type + panel body).
 - insert:
     - id: git-sidebar
-      name: 'dsh-git-sidebar'
+      name: '@hennychen/dsh-git-sidebar'

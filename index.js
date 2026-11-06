@@ -923,16 +923,16 @@ async function handleApi(ctx, req, url) {
     if (op === 'repos') return discoverRepos(ctx, sid)
     if (op === 'client-events') return { ok: true, events: clientEvents }
     if (op === 'client-asset') {
-      const out = { ok: true, id: 'dsh-git-sidebar', path: null, inGraph: null, graphKeys: [], bytes: 0 }
+      const out = { ok: true, id: '@hennychen/dsh-git-sidebar', path: null, inGraph: null, graphKeys: [], bytes: 0 }
       try {
         const clientModules = typeof ctx.get === 'function' ? ctx.get('clientModules') : undefined
         if (clientModules) {
-          out.path = clientModules.clientPath('dsh-git-sidebar') || null
+          out.path = clientModules.clientPath('@hennychen/dsh-git-sidebar') || null
           const graph = clientModules.graph()
           if (graph && typeof graph === 'object') {
             out.graphKeys = Object.keys(graph)
             const text = JSON.stringify(graph)
-            out.inGraph = text.includes('dsh-git-sidebar')
+            out.inGraph = text.includes('@hennychen/dsh-git-sidebar')
             out.graphBytes = text.length
           }
         }

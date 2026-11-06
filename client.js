@@ -6,14 +6,14 @@
 // multi mode), and a "Graph" section backed by `git log --graph` with its own
 // repository picker, branch multi-select and branch-labelled lanes.
 window.__ModuleLoader__.load({
-  id: 'dsh-git-sidebar',
+  id: '@hennychen/dsh-git-sidebar',
   factory: (require) => {
     const React = require('react')
     const h = React.createElement
     const { useCallback, useEffect, useMemo, useRef, useState } = React
 
     const NS = 'gitSidebar'
-    const ID = 'dsh-git-sidebar'
+    const ID = '@hennychen/dsh-git-sidebar'
     const KIND = 'git'
 
     let beaconCount = 0
