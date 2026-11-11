@@ -324,7 +324,7 @@ window.__ModuleLoader__.load({
 .gs-repo-row:hover{background:var(--dsw-alias-bg-layer-2)}
 .gs-repo-row-on{background:var(--dsw-alias-bg-layer-2)}
 .gs-cb{width:13px;height:13px;flex:0 0 auto;border:1px solid var(--dsw-alias-border-l2);border-radius:3px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;line-height:1;color:#fff}
-.gs-cb-on{background:var(--dsw-alias-brand-primary);border-color:var(--dsw-alias-brand-primary)}
+.gs-cb-on{background:#4d6bfe;border-color:#4d6bfe}
 .gs-repo-name{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11.5px}
 .gs-repo-row-on .gs-repo-name{font-weight:600}
 .gs-branch-pill{display:inline-flex;align-items:center;gap:3px;flex:0 1 auto;max-width:52%;padding:0 5px;height:16px;border-radius:8px;background:var(--dsw-alias-bg-layer-2);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:10px;color:var(--dsw-alias-label-secondary);cursor:pointer;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
@@ -377,7 +377,7 @@ window.__ModuleLoader__.load({
 .gs-cdetail-path{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 .gs-cdetail-add{flex:0 0 auto;color:var(--dsw-alias-state-success-primary);font-size:10px}
 .gs-cdetail-del{flex:0 0 auto;color:var(--dsw-alias-state-error-primary);font-size:10px}
-.gs-primary{flex:0 0 auto;display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border:1px solid transparent;border-radius:4px;background:var(--dsw-alias-brand-primary);color:#fff;font:inherit;font-size:11px;cursor:pointer;white-space:nowrap}
+.gs-primary{flex:0 0 auto;display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border:1px solid transparent;border-radius:4px;background:#4d6bfe;color:#fff;font:inherit;font-size:11px;cursor:pointer;white-space:nowrap}
 .gs-primary:hover{filter:brightness(1.07)}
 .gs-primary:disabled{opacity:.45;cursor:default;filter:none}
 .gs-file{display:flex;flex-direction:column;min-width:0}
@@ -2143,7 +2143,7 @@ window.__ModuleLoader__.load({
                       const color = info.branch ? branchColor(info.branch.name) : ''
                       const style = color
                         ? {
-                          color: info.kind === 'head' ? '#fff' : color,
+                          color: info.kind === 'head' ? '#0d1117' : color,
                           borderColor: color,
                           background: info.kind === 'head' ? color : 'transparent',
                         }
