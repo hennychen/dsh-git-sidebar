@@ -104,6 +104,34 @@ window.__ModuleLoader__.load({
       'graph.branchTip': 'tip',
       'commit.placeholder': '消息（按 ⌘Enter 提交到 {branch}）',
       'commit.noStaged': '没有已暂存的更改',
+      'commit.menuTitle': '更多提交操作',
+      'commit.commitPush': '提交并推送',
+      'commit.amend': '修正上次提交（Amend）',
+      'commit.undo': '撤销上次提交（保留更改）',
+      'commit.history': '提交信息历史',
+      'commit.noHistory': '暂无历史记录',
+      'commit.detailLoading': '正在加载提交详情…',
+      'commit.detailFiles': '变更文件',
+      'commit.detailNoFiles': '此提交没有文件变更',
+      'commit.detailCheckout': '签出此提交（分离 HEAD）',
+      'commit.detailBranch': '从此提交新建分支…',
+      'commit.detailTag': '在此提交打标记…',
+      'confirm.checkoutCommit': '签出提交将进入分离 HEAD 状态，是否继续？',
+      'search.changes': '筛选更改文件…',
+      'search.graph': '筛选提交（信息/作者/哈希）…',
+      'search.clear': '清除筛选',
+      'search.noMatch': '没有匹配的更改',
+      'msg.commitAll': '已提交全部更改',
+      'msg.undoCommit': '已撤销上次提交',
+      'msg.checkoutCommit': '已签出提交（分离 HEAD）',
+      'msg.branchDelete': '已删除分支',
+      'msg.stashPush': '已储藏更改',
+      'msg.stashPop': '已弹出储藏',
+      'msg.stashDrop': '已删除储藏',
+      'msg.tagCreate': '已创建标记',
+      'msg.tagDelete': '已删除标记',
+      'msg.worktreeAdd': '已创建工作树',
+      'msg.clone': '已克隆仓库',
       'empty.noRepos': '没有可管理的 Git 存储库',
       'empty.loading': '正在读取存储库…',
       'empty.clean': '没有更改',
@@ -211,6 +239,34 @@ window.__ModuleLoader__.load({
       'graph.branchTip': 'tip',
       'commit.placeholder': 'Message (press ⌘Enter to commit on "{branch}")',
       'commit.noStaged': 'No staged changes',
+      'commit.menuTitle': 'More commit actions',
+      'commit.commitPush': 'Commit & Push',
+      'commit.amend': 'Amend Last Commit',
+      'commit.undo': 'Undo Last Commit (keep changes)',
+      'commit.history': 'Commit message history',
+      'commit.noHistory': 'No recent messages',
+      'commit.detailLoading': 'Loading commit details…',
+      'commit.detailFiles': 'Changed files',
+      'commit.detailNoFiles': 'This commit has no file changes',
+      'commit.detailCheckout': 'Checkout this commit (detached HEAD)',
+      'commit.detailBranch': 'Create branch from this commit…',
+      'commit.detailTag': 'Tag this commit…',
+      'confirm.checkoutCommit': 'Checking out a commit leaves a detached HEAD. Continue?',
+      'search.changes': 'Filter changed files…',
+      'search.graph': 'Filter commits (message / author / hash)…',
+      'search.clear': 'Clear filter',
+      'search.noMatch': 'No matching changes',
+      'msg.commitAll': 'Committed all changes',
+      'msg.undoCommit': 'Last commit undone',
+      'msg.checkoutCommit': 'Checked out commit (detached HEAD)',
+      'msg.branchDelete': 'Branch deleted',
+      'msg.stashPush': 'Changes stashed',
+      'msg.stashPop': 'Stash popped',
+      'msg.stashDrop': 'Stash dropped',
+      'msg.tagCreate': 'Tag created',
+      'msg.tagDelete': 'Tag deleted',
+      'msg.worktreeAdd': 'Worktree created',
+      'msg.clone': 'Repository cloned',
       'empty.noRepos': 'No Git repository to manage',
       'empty.loading': 'Reading repositories…',
       'empty.clean': 'No changes',
@@ -291,11 +347,36 @@ window.__ModuleLoader__.load({
 .gs-sub-head{display:flex;align-items:center;gap:5px;padding:4px 8px 2px;font-size:11px;color:var(--dsw-alias-label-secondary);min-width:0}
 .gs-sub-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;color:var(--dsw-alias-label-primary)}
 .gs-sub-branch{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.gs-commit{flex:0 0 auto;margin:6px 8px 2px;border:1px solid var(--dsw-alias-border-l2);border-radius:4px;background:var(--dsw-alias-bg-layer-1);display:flex;flex-direction:column;overflow:hidden}
+.gs-commit{flex:0 0 auto;margin:6px 8px 2px;border:1px solid var(--dsw-alias-border-l2);border-radius:4px;background:var(--dsw-alias-bg-layer-1);display:flex;flex-direction:column;overflow:visible}
 .gs-commit:focus-within{border-color:var(--dsw-alias-brand-primary)}
 .gs-commit-input{width:100%;box-sizing:border-box;resize:vertical;min-height:40px;max-height:140px;padding:5px 7px;border:none;background:transparent;color:var(--dsw-alias-label-primary);font:inherit;font-size:11.5px;outline:none}
 .gs-commit-input::placeholder{color:var(--dsw-alias-label-secondary);opacity:.8}
-.gs-commit-bar{display:flex;align-items:center;gap:6px;justify-content:flex-end;padding:3px 5px;border-top:1px solid var(--dsw-alias-border-l1)}
+.gs-commit-bar{display:flex;align-items:center;gap:6px;justify-content:flex-end;padding:3px 5px;border-top:1px solid var(--dsw-alias-border-l1);position:relative}
+.gs-commit-wrap{position:relative}
+.gs-commit-hist{position:absolute;right:4px;bottom:4px;width:18px;height:18px;padding:0;display:inline-flex;align-items:center;justify-content:center;border:none;border-radius:4px;background:transparent;color:var(--dsw-alias-label-secondary);cursor:pointer}
+.gs-commit-hist:hover{background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-primary)}
+.gs-commit-history{position:absolute;right:4px;bottom:24px;z-index:45;min-width:200px;max-width:280px;max-height:180px;overflow-y:auto;padding:4px;border:1px solid var(--dsw-alias-border-l2);border-radius:6px;background:var(--dsw-alias-bg-overlay);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.gs-commit-history .gs-menu-item{display:block;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}
+.gs-commit-split{display:flex;align-items:stretch}
+.gs-commit-main{border-radius:4px 0 0 4px;padding-right:8px}
+.gs-commit-caret{width:22px;border-radius:0 4px 4px 0;border-left:1px solid rgba(255,255,255,.28);padding:0;justify-content:center}
+.gs-commit-menu{position:absolute;right:5px;bottom:32px;z-index:45;min-width:190px;padding:4px;border:1px solid var(--dsw-alias-border-l2);border-radius:6px;background:var(--dsw-alias-bg-overlay);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.gs-filter-wrap{display:flex;align-items:center;gap:2px;margin:2px 8px 4px}
+.gs-filter{flex:1 1 auto;min-width:0;height:22px;padding:0 6px;border:1px solid var(--dsw-alias-border-l1);border-radius:4px;background:var(--dsw-alias-bg-base);color:var(--dsw-alias-label-primary);font:inherit;font-size:11px}
+.gs-filter:focus{outline:none;border-color:var(--dsw-alias-brand-primary)}
+.gs-grow-click{cursor:pointer}
+.gs-grow-sel{background:var(--dsw-alias-bg-layer-2)}
+.gs-cdetail{margin:0 8px 6px 26px;padding:6px 8px;border:1px solid var(--dsw-alias-border-l1);border-radius:6px;background:var(--dsw-alias-bg-layer-1)}
+.gs-cdetail-head{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.gs-cdetail-hash{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:10px;color:var(--dsw-alias-brand-primary)}
+.gs-cdetail-meta{font-size:10px;color:var(--dsw-alias-label-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gs-cdetail-msg{white-space:pre-wrap;font-size:11px;line-height:1.45;color:var(--dsw-alias-label-primary);max-height:120px;overflow-y:auto;margin-bottom:5px}
+.gs-cdetail-files{display:flex;flex-direction:column;gap:1px;max-height:160px;overflow-y:auto;margin-bottom:2px}
+.gs-cdetail-file{display:flex;align-items:center;gap:6px;padding:2px 4px;border:none;border-radius:3px;background:transparent;color:var(--dsw-alias-label-primary);font:inherit;font-size:10.5px;text-align:left;cursor:pointer}
+.gs-cdetail-file:hover{background:var(--dsw-alias-bg-layer-2)}
+.gs-cdetail-path{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.gs-cdetail-add{flex:0 0 auto;color:var(--dsw-alias-state-success-primary);font-size:10px}
+.gs-cdetail-del{flex:0 0 auto;color:var(--dsw-alias-state-error-primary);font-size:10px}
 .gs-primary{flex:0 0 auto;display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border:1px solid transparent;border-radius:4px;background:var(--dsw-alias-brand-primary);color:#fff;font:inherit;font-size:11px;cursor:pointer;white-space:nowrap}
 .gs-primary:hover{filter:brightness(1.07)}
 .gs-primary:disabled{opacity:.45;cursor:default;filter:none}
@@ -425,6 +506,7 @@ window.__ModuleLoader__.load({
       fetch: ['M12.5 8a4.5 4.5 0 1 1-2-3.7', 'M13.5 3v3.5H10'],
       chevronDown: ['M4.5 6.5L8 10l3.5-3.5'],
       chevronRight: ['M6.5 4.5L10 8l-3.5 3.5'],
+      clock: ['M8 13.5a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11z', 'M8 4.8V8l2.2 1.4'],
     }
 
     function FileGlyph() {
@@ -495,6 +577,10 @@ window.__ModuleLoader__.load({
     const apiGraph = (sid, root, refs) => requestJson('/git-sidebar/api?op=graph&sid=' + q(sid) + (root ? '&root=' + q(root) : '') +
       (Array.isArray(refs) && refs.length > 0 ? '&refs=' + q(refs.join(',')) : ''), { method: 'GET' })
     const apiRead = (sid, op, root) => requestJson('/git-sidebar/api?op=' + op + '&sid=' + q(sid) + (root ? '&root=' + q(root) : ''), { method: 'GET' })
+    const apiCommitDetail = (sid, root, commit) => requestJson('/git-sidebar/api?op=commitDetail&sid=' + q(sid) +
+      (root ? '&root=' + q(root) : '') + '&commit=' + q(commit), { method: 'GET' })
+    const apiCommitDiff = (sid, root, commit, path) => requestJson('/git-sidebar/api?op=commitDiff&sid=' + q(sid) +
+      (root ? '&root=' + q(root) : '') + '&commit=' + q(commit) + '&path=' + q(path), { method: 'GET' })
     const apiDiff = (sid, path, staged, root) => requestJson('/git-sidebar/api?op=diff&sid=' + q(sid) +
       '&path=' + q(path) + '&staged=' + (staged ? '1' : '0') + (root ? '&root=' + q(root) : ''), { method: 'GET' })
     const apiWrite = (payload) => requestJson('/git-sidebar/api', {
@@ -779,6 +865,12 @@ window.__ModuleLoader__.load({
         const [changesSort, setChangesSort] = useState('path')
         const [expandedDirs, setExpandedDirs] = useState({})
         const [menuData, setMenuData] = useState({})
+        const [commitMenu, setCommitMenu] = useState('')
+        const [historyOpen, setHistoryOpen] = useState('')
+        const [msgHistory, setMsgHistory] = useState({})
+        const [commitDetail, setCommitDetail] = useState(null)
+        const [changesFilter, setChangesFilter] = useState('')
+        const [graphFilter, setGraphFilter] = useState('')
         /** root -> selected full ref names (`[]` = none, missing = all branches) */
         const [graphRefs, setGraphRefs] = useState({})
         /** root -> branch list from the last graph response, so the picker survives repo switches */
@@ -821,6 +913,40 @@ window.__ModuleLoader__.load({
             window.localStorage.setItem(persistKey, JSON.stringify(Object.assign({}, current, patch)))
           } catch { /* ignore */ }
         }, [persistKey])
+
+        // ---------- commit message history (per session, per repository) ----------
+        useEffect(() => {
+          if (sid === '') return
+          try {
+            const raw = JSON.parse(window.localStorage.getItem('dsh-git-sidebar:msg-history:' + sid) || '{}')
+            if (raw && typeof raw === 'object' && !Array.isArray(raw)) setMsgHistory(raw)
+          } catch { /* ignore */ }
+        }, [sid])
+
+        useEffect(() => {
+          if (commitMenu === '' && historyOpen === '') return undefined
+          const close = (event) => {
+            const target = event.target
+            if (target instanceof Element && typeof target.closest === 'function' &&
+              (target.closest('.gs-commit-menu') || target.closest('.gs-commit-history') ||
+               target.closest('.gs-commit-caret') || target.closest('.gs-commit-hist'))) return
+            setCommitMenu('')
+            setHistoryOpen('')
+          }
+          document.addEventListener('mousedown', close)
+          return () => document.removeEventListener('mousedown', close)
+        }, [commitMenu, historyOpen])
+
+        const rememberMessage = useCallback((root, message) => {
+          const text = String(message || '').trim()
+          if (text === '' || !root) return
+          setMsgHistory((current) => {
+            const list = [text].concat((current[root] || []).filter((item) => item !== text)).slice(0, 20)
+            const next = Object.assign({}, current, { [root]: list })
+            try { window.localStorage.setItem('dsh-git-sidebar:msg-history:' + sid, JSON.stringify(next)) } catch { /* ignore */ }
+            return next
+          })
+        }, [sid])
 
         /** Persist one repository's branch selection; `null` restores "all branches". */
         const applyGraphRefs = useCallback((root, refs) => {
@@ -981,7 +1107,16 @@ window.__ModuleLoader__.load({
           return () => { cancelled = true }
         }, [sid, activeRepo, sections.graph, graphTick, graphEntryKey, applyGraphRefs])
 
-        const graphData = useMemo(() => buildGraphRows(graph && Array.isArray(graph.lines) ? graph.lines : []), [graph])
+        const graphData = useMemo(() => {
+          const lines = graph && Array.isArray(graph.lines) ? graph.lines : []
+          const needle = graphFilter.trim().toLowerCase()
+          const visible = needle === '' ? lines : lines.filter((line) => {
+            if (!line.hash) return true
+            const hay = [line.subject, line.author, line.short, (line.refs || []).join(' ')].join(' ').toLowerCase()
+            return hay.includes(needle)
+          })
+          return buildGraphRows(visible)
+        }, [graph, graphFilter])
 
         /** Branch rows for the picker; falls back to the cached list while a repo's graph reloads. */
         const graphBranchList = useMemo(() => {
@@ -1039,9 +1174,10 @@ window.__ModuleLoader__.load({
           try {
             const result = await apiWrite(Object.assign({ op, sid }, root ? { root } : {}, extra || {}))
             if (result && result.ok) {
-              if (op === 'commit') {
+              if (op === 'commit' || op === 'commitAll') {
                 if (root === activeRoot) setMessage('')
                 setMessages((current) => Object.assign({}, current, { [root]: '' }))
+                rememberMessage(root, extra && extra.message)
               }
               if (op === 'checkout' || op === 'createBranch') { setBranchDraft(''); setBranchForm(false); setBranchMenu('') }
               setNotice(tr('msg.' + op) || '')
@@ -1059,7 +1195,7 @@ window.__ModuleLoader__.load({
           } finally {
             setBusy(false)
           }
-        }, [sid, activeRoot, mode, refreshRepos, refreshInfo, refreshMulti, tr])
+        }, [sid, activeRoot, mode, refreshRepos, refreshInfo, refreshMulti, tr, rememberMessage])
 
         // Fetch lazy menu data (stashes/tags/worktrees/remotes) per root
         const loadMenuData = useCallback(async (root, kind) => {
@@ -1501,35 +1637,114 @@ window.__ModuleLoader__.load({
                       entry.truncated ? h('div', { className: 'gs-diff-note' }, tr('diff.truncated')) : null)) : null)
         }
 
-        const commitBox = (root, value, onChange, stagedCount, branch) => h('div', { className: 'gs-commit' },
-          h('textarea', {
-            className: 'gs-commit-input', rows: 3,
-            placeholder: String(tr('commit.placeholder')).replace('{branch}', branch || 'HEAD'),
-            value, disabled: busy,
-            onChange: (event) => onChange(event.target.value),
-            onKeyDown: (event) => {
-              if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
-                event.preventDefault()
-                if (value.trim() !== '' && stagedCount > 0) act(root, 'commit', { message: value })
+        const commitBox = (root, value, onChange, target, branch) => {
+          const counts = (target && target.counts) || {}
+          const stagedCount = counts.staged || 0
+          const totalCount = counts.total || 0
+          const history = msgHistory[root] || []
+          const menuOpen = commitMenu === root
+          const historyVisible = historyOpen === root
+          const canCommit = value.trim() !== '' && stagedCount > 0
+          const run = (op, extra) => { setCommitMenu(''); act(root, op, Object.assign({ message: value }, extra || {})) }
+          const commitAndPush = async () => {
+            setCommitMenu('')
+            if (!canCommit) return
+            setBusy(true)
+            setError('')
+            setNotice('')
+            try {
+              const committed = await apiWrite({ op: 'commit', sid, root, message: value })
+              if (!committed || !committed.ok) {
+                setError((committed && (committed.message || committed.error)) || 'commit failed')
+                return
               }
-            },
-          }),
-          h('div', { className: 'gs-commit-bar' },
-            h('button', {
-              type: 'button', className: 'gs-primary',
-              disabled: busy || value.trim() === '' || stagedCount === 0,
-              title: stagedCount === 0 ? tr('commit.noStaged') : tr('action.commit'),
-              onClick: () => act(root, 'commit', { message: value }),
-            }, h(Glyph, { d: ICON.check, size: 12 }), tr('action.commit'))))
+              rememberMessage(root, value)
+              if (root === activeRoot) setMessage('')
+              setMessages((current) => Object.assign({}, current, { [root]: '' }))
+              const pushed = await apiWrite({ op: 'push', sid, root })
+              if (!pushed || !pushed.ok) setError((pushed && (pushed.message || pushed.error)) || 'push failed')
+              else setNotice(tr('msg.commit') + ' · ' + tr('msg.push'))
+              setGraphTick((tick) => tick + 1)
+              await refreshRepos()
+              await refreshInfo(root === activeRoot ? root : activeRoot)
+              if (mode === 'multiple') await refreshMulti()
+            } catch (err) {
+              setError(String((err && err.message) || err))
+            } finally {
+              setBusy(false)
+            }
+          }
+          return h('div', { className: 'gs-commit' },
+            h('div', { className: 'gs-commit-wrap' },
+              h('textarea', {
+                className: 'gs-commit-input', rows: 3,
+                placeholder: String(tr('commit.placeholder')).replace('{branch}', branch || 'HEAD'),
+                value, disabled: busy,
+                onChange: (event) => onChange(event.target.value),
+                onKeyDown: (event) => {
+                  if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+                    event.preventDefault()
+                    if (canCommit) act(root, 'commit', { message: value })
+                  }
+                },
+              }),
+              h('button', {
+                type: 'button', className: 'gs-commit-hist', title: tr('commit.history'),
+                onClick: () => { setHistoryOpen(historyVisible ? '' : root); setCommitMenu('') },
+              }, h(Glyph, { d: ICON.clock, size: 11 })),
+              historyVisible
+                ? h('div', { className: 'gs-commit-history' },
+                  history.length === 0
+                    ? h('div', { className: 'gs-meta-line' }, tr('commit.noHistory'))
+                    : history.slice(0, 10).map((item, at) => h('button', {
+                      key: at, type: 'button', className: 'gs-menu-item', title: item,
+                      onClick: () => { onChange(item); setHistoryOpen('') },
+                    }, item)))
+                : null),
+            h('div', { className: 'gs-commit-bar' },
+              menuOpen
+                ? h('div', { className: 'gs-commit-menu' },
+                  h('button', { type: 'button', className: 'gs-menu-item', disabled: !canCommit, onClick: () => run('commit') }, tr('action.commit')),
+                  h('button', { type: 'button', className: 'gs-menu-item', disabled: busy || value.trim() === '' || totalCount === 0, onClick: () => run('commitAll') }, tr('git.commitAll')),
+                  h('button', { type: 'button', className: 'gs-menu-item', disabled: !canCommit, onClick: commitAndPush }, tr('commit.commitPush')),
+                  h('div', { className: 'gs-menu-sep' }),
+                  h('button', { type: 'button', className: 'gs-menu-item', disabled: busy, onClick: () => run('commit', { amend: true }) }, tr('commit.amend')),
+                  h('button', { type: 'button', className: 'gs-menu-item', disabled: busy, onClick: () => { setCommitMenu(''); act(root, 'undoCommit') } }, tr('commit.undo')))
+                : null,
+              h('div', { className: 'gs-commit-split' },
+                h('button', {
+                  type: 'button', className: 'gs-primary gs-commit-main',
+                  disabled: busy || !canCommit,
+                  title: stagedCount === 0 ? tr('commit.noStaged') : tr('action.commit'),
+                  onClick: () => act(root, 'commit', { message: value }),
+                }, h(Glyph, { d: ICON.check, size: 12 }), tr('action.commit')),
+                h('button', {
+                  type: 'button', className: 'gs-primary gs-commit-caret',
+                  disabled: busy, title: tr('commit.menuTitle'),
+                  onClick: () => { setCommitMenu(menuOpen ? '' : root); setHistoryOpen('') },
+                }, h(Glyph, { d: ICON.chevronDown, size: 10 })))))
+        }
 
         const changesBlock = (root, target, messageValue, setMessageValue) => {
           const files = target.files || []
-          const stagedFiles = files.filter((file) => file.staged)
-          const workingFiles = files.filter((file) => !file.staged)
           const counts = target.counts || { staged: 0, changed: 0, untracked: 0, total: 0 }
           const branch = target.detached ? tr('detached') : (target.branch || '')
+          const needle = changesFilter.trim().toLowerCase()
+          const match = (file) => needle === '' || String(file.path || '').toLowerCase().includes(needle)
+          const stagedFiles = files.filter((file) => file.staged && match(file))
+          const workingFiles = files.filter((file) => !file.staged && match(file))
           return h('div', { className: 'gs-sub', key: 'changes:' + root },
-            commitBox(root, messageValue || '', setMessageValue, counts.staged, branch),
+            commitBox(root, messageValue || '', setMessageValue, target, branch),
+            files.length > 0
+              ? h('div', { className: 'gs-filter-wrap' },
+                h('input', {
+                  className: 'gs-filter', placeholder: tr('search.changes'), value: changesFilter,
+                  onChange: (event) => setChangesFilter(event.target.value),
+                }),
+                changesFilter !== ''
+                  ? h('button', { type: 'button', className: 'gs-gtool', title: tr('search.clear'), onClick: () => setChangesFilter('') }, '✕')
+                  : null)
+              : null,
             workingFiles.length > 0
               ? h('div', { className: 'gs-group' },
                 h('div', { className: 'gs-group-head' },
@@ -1550,9 +1765,11 @@ window.__ModuleLoader__.load({
                     iconButton('minus', tr('action.unstageAll'), () => act(root, 'unstageAll'), busy))),
                 stagedFiles.map((file) => fileRow(root, file, true)))
               : null,
-            counts.total === 0
+            files.length === 0 && counts.total === 0
               ? h('div', { className: 'gs-clean' }, h(Glyph, { d: ICON.check, size: 12 }), tr('empty.clean'))
-              : null)
+              : files.length > 0 && workingFiles.length === 0 && stagedFiles.length === 0
+                ? h('div', { className: 'gs-empty' }, tr('search.noMatch'))
+                : null)
         }
 
         const shell = (...children) => h('div', { className: 'gs-root', ref: rootRef }, ...children)
@@ -1626,8 +1843,12 @@ window.__ModuleLoader__.load({
         } else if (info !== null && info.isGit && info.repo && info.repo.root === activeRepo.path) {
           if (changesView === 'tree') {
             changesBody = h('div', { className: 'gs-sub', key: 'active-tree' },
-              commitBox(activeRepo.path, message, setMessage, (info.counts || {}).staged || 0, info.detached ? tr('detached') : info.branch),
-              h(TreeChanges, { root: activeRepo.path, files: info.files || [], fileRow, changesOpen, expandedDirs, setExpandedDirs }))
+              commitBox(activeRepo.path, message, setMessage, info, info.detached ? tr('detached') : info.branch),
+              h(TreeChanges, {
+                root: activeRepo.path,
+                files: (info.files || []).filter((file) => changesFilter.trim() === '' || String(file.path || '').toLowerCase().includes(changesFilter.trim().toLowerCase())),
+                fileRow, changesOpen, expandedDirs, setExpandedDirs,
+              }))
           } else {
             changesBody = h('div', { className: 'gs-sub', key: 'active' }, changesBlock(activeRepo.path, info, message, setMessage))
           }
@@ -1794,44 +2015,150 @@ window.__ModuleLoader__.load({
               : null)
           : null
 
+        // ---------- commit details (VS Code-style: click a commit to inspect) ----------
+        const toggleCommitDetail = async (root, hash) => {
+          if (commitDetail !== null && commitDetail.hash === hash && !commitDetail.loading) {
+            setCommitDetail(null)
+            return
+          }
+          setCommitDetail({ hash, loading: true, data: null, files: [], diff: null })
+          try {
+            const result = await apiCommitDetail(sid, root, hash)
+            if (result && result.ok) {
+              setCommitDetail({ hash, loading: false, data: result.commit, files: result.files || [], diff: null })
+            } else {
+              setCommitDetail({ hash, loading: false, data: null, files: [], diff: null, error: (result && (result.message || result.error)) || 'failed' })
+            }
+          } catch (err) {
+            setCommitDetail({ hash, loading: false, data: null, files: [], diff: null, error: String((err && err.message) || err) })
+          }
+        }
+
+        const openCommitFile = async (root, hash, path) => {
+          setCommitDetail((current) => (current !== null && current.hash === hash)
+            ? Object.assign({}, current, { diff: { path, loading: true } })
+            : current)
+          try {
+            const result = await apiCommitDiff(sid, root, hash, path)
+            setCommitDetail((current) => (current !== null && current.hash === hash)
+              ? Object.assign({}, current, { diff: { path, loading: false, text: (result && result.diff) || '', truncated: !!(result && result.truncated) } })
+              : current)
+          } catch (err) {
+            setCommitDetail((current) => (current !== null && current.hash === hash)
+              ? Object.assign({}, current, { diff: { path, loading: false, error: String((err && err.message) || err) } })
+              : current)
+          }
+        }
+
+        const renderCommitDetail = (root) => {
+          const detail = commitDetail
+          if (detail === null) return null
+          if (detail.loading) return h('div', { className: 'gs-cdetail' }, h('div', { className: 'gs-diff-note' }, tr('commit.detailLoading')))
+          if (detail.error) return h('div', { className: 'gs-cdetail' }, h('div', { className: 'gs-diff-note' }, detail.error))
+          const data = detail.data || {}
+          const when = data.at ? new Date(data.at).toLocaleString() : ''
+          return h('div', { className: 'gs-cdetail' },
+            h('div', { className: 'gs-cdetail-head' },
+              h('span', { className: 'gs-cdetail-hash' }, data.short || ''),
+              h('span', { className: 'gs-cdetail-meta' }, (data.author || '') + (when ? ' · ' + when : '')),
+              h('span', { style: { flex: '1 1 auto' } }),
+              h('button', {
+                type: 'button', className: 'gs-gtool', title: tr('commit.detailCheckout'),
+                onClick: () => {
+                  if (typeof window !== 'undefined' && !window.confirm(tr('confirm.checkoutCommit'))) return
+                  act(root, 'checkoutCommit', { commit: data.hash })
+                },
+              }, h(Glyph, { d: ICON.branch, size: 12 })),
+              h('button', {
+                type: 'button', className: 'gs-gtool', title: tr('commit.detailBranch'),
+                onClick: () => openDialog(tr('commit.detailBranch'), [{ key: 'name', label: tr('dialog.branchName') }], (values) => {
+                  if (values.name && values.name.trim()) act(root, 'createBranch', { branch: values.name.trim(), commit: data.hash })
+                }),
+              }, h(Glyph, { d: ICON.plus, size: 12 })),
+              h('button', {
+                type: 'button', className: 'gs-gtool', title: tr('commit.detailTag'),
+                onClick: () => openDialog(tr('commit.detailTag'), [{ key: 'name', label: tr('dialog.tagName') }], (values) => {
+                  if (values.name && values.name.trim()) act(root, 'tagCreate', { name: values.name.trim(), commit: data.hash })
+                }),
+              }, h(Glyph, { d: ICON.cloud, size: 12 }))),
+            h('div', { className: 'gs-cdetail-msg' }, data.message || ''),
+            h('div', { className: 'gs-cdetail-files' },
+              detail.files.length === 0
+                ? h('div', { className: 'gs-meta-line' }, tr('commit.detailNoFiles'))
+                : detail.files.map((file) => h('button', {
+                  key: file.path, type: 'button', className: 'gs-cdetail-file', title: file.path,
+                  onClick: () => openCommitFile(root, data.hash, file.path),
+                },
+                  h('span', { className: 'gs-cdetail-path' }, file.path),
+                  h('span', { className: 'gs-cdetail-add' }, file.binary ? 'bin' : '+' + file.add),
+                  h('span', { className: 'gs-cdetail-del' }, file.binary ? '' : '-' + file.del)))),
+            detail.diff !== null
+              ? h('div', { className: 'gs-diff' },
+                detail.diff.loading
+                  ? h('div', { className: 'gs-diff-note' }, tr('diff.loading'))
+                  : detail.diff.error
+                    ? h('div', { className: 'gs-diff-note' }, detail.diff.error)
+                    : String(detail.diff.text || '').trim() === ''
+                      ? h('div', { className: 'gs-diff-note' }, tr('diff.empty'))
+                      : h(React.Fragment, null,
+                        diffLines(detail.diff.text),
+                        detail.diff.truncated ? h('div', { className: 'gs-diff-note' }, tr('diff.truncated')) : null))
+              : null)
+        }
+
+        const graphFilterBar = graphOpen && activeRepo
+          ? h('div', { className: 'gs-filter-wrap' },
+            h('input', {
+              className: 'gs-filter', placeholder: tr('search.graph'), value: graphFilter,
+              onChange: (event) => setGraphFilter(event.target.value),
+            }),
+            graphFilter !== ''
+              ? h('button', { type: 'button', className: 'gs-gtool', title: tr('search.clear'), onClick: () => setGraphFilter('') }, '✕')
+              : null)
+          : null
+
         const graphBody = graph === null || graph.root !== (activeRepo ? activeRepo.path : '')
           ? h('div', { className: 'gs-empty' }, tr('empty.loading'))
           : graphExplicitRefs !== null && graphExplicitRefs.length === 0
             ? h('div', { className: 'gs-empty' }, tr('graph.noneSelected'))
             : graphData.rows.length === 0
-              ? h('div', { className: 'gs-empty' }, tr('empty.graph'))
+              ? h('div', { className: 'gs-empty' }, graphFilter.trim() !== '' ? tr('search.noMatch') : tr('empty.graph'))
               : graphData.rows.map((row, at) => {
                 const refs = row.commit.refs || []
                 const shown = refs.slice(0, 3)
                 const extra = refs.length - shown.length
                 const when = row.commit.at ? relativeTime(tr, row.commit.at) : ''
-                return h('div', {
-                  className: 'gs-grow', key: row.commit.hash || at,
-                  title: row.commit.subject + ' — ' + (row.commit.author || '') + (when ? ' · ' + when : ''),
-                },
-                  graphSvg(graphData, at),
-                  h('span', { className: 'gs-ghash' }, row.commit.short),
-                  h('span', { className: 'gs-gsub' }, row.commit.subject),
-                  shown.map((ref) => {
-                    const info = decorateGraphRef(ref, graphBranchByName)
-                    const color = info.branch ? branchColor(info.branch.name) : ''
-                    const style = color
-                      ? {
-                        color: info.kind === 'head' ? '#fff' : color,
-                        borderColor: color,
-                        background: info.kind === 'head' ? color : 'transparent',
-                      }
-                      : undefined
-                    return h('span', {
-                      key: ref,
-                      className: 'gs-gref gs-gref-' + info.kind,
-                      style,
-                      title: info.kind === 'head' ? 'HEAD → ' + info.text : ref,
-                    }, info.text)
-                  }),
-                  extra > 0
-                    ? h('span', { className: 'gs-gmore', title: refs.slice(3).join(', ') }, '+' + extra)
-                    : null)
+                const isOpen = commitDetail !== null && commitDetail.hash === row.commit.hash
+                return h(React.Fragment, { key: row.commit.hash || at },
+                  h('div', {
+                    className: 'gs-grow gs-grow-click' + (isOpen ? ' gs-grow-sel' : ''),
+                    title: row.commit.subject + ' — ' + (row.commit.author || '') + (when ? ' · ' + when : ''),
+                    onClick: () => toggleCommitDetail(graph.root, row.commit.hash),
+                  },
+                    graphSvg(graphData, at),
+                    h('span', { className: 'gs-ghash' }, row.commit.short),
+                    h('span', { className: 'gs-gsub' }, row.commit.subject),
+                    shown.map((ref) => {
+                      const info = decorateGraphRef(ref, graphBranchByName)
+                      const color = info.branch ? branchColor(info.branch.name) : ''
+                      const style = color
+                        ? {
+                          color: info.kind === 'head' ? '#fff' : color,
+                          borderColor: color,
+                          background: info.kind === 'head' ? color : 'transparent',
+                        }
+                        : undefined
+                      return h('span', {
+                        key: ref,
+                        className: 'gs-gref gs-gref-' + info.kind,
+                        style,
+                        title: info.kind === 'head' ? 'HEAD → ' + info.text : ref,
+                      }, info.text)
+                    }),
+                    extra > 0
+                      ? h('span', { className: 'gs-gmore', title: refs.slice(3).join(', ') }, '+' + extra)
+                      : null),
+                  isOpen ? renderCommitDetail(graph.root) : null)
               })
 
         const graphSection = sections.graph
@@ -1850,6 +2177,7 @@ window.__ModuleLoader__.load({
                 graphToolbar,
                 graphRepoPanel,
                 graphBranchPanel,
+                graphFilterBar,
                 graphLegend,
                 graphBody)
               : null)

@@ -26,12 +26,12 @@ const MAX_MESSAGE = 5000
 const MAX_DIFF_CHARS = 300000
 const MAX_SYNTH_BYTES = 200000
 
-const READ_OPS = new Set(['info', 'diff', 'workspaces', 'client-events', 'client-asset', 'repos', 'graph', 'gitlog', 'remotes', 'stashes', 'tags', 'worktrees'])
+const READ_OPS = new Set(['info', 'diff', 'workspaces', 'client-events', 'client-asset', 'repos', 'graph', 'gitlog', 'remotes', 'stashes', 'tags', 'worktrees', 'commitDetail', 'commitDiff'])
 const DIAG_OPS = new Set(['client-event'])
 const WRITE_OPS = new Set([
   'stage', 'unstage', 'stageAll', 'unstageAll',
   'discard', 'discardAll', 'commit',
-  'checkout', 'createBranch', 'branchDelete', 'fetch', 'pull', 'push', 'sync',
+  'checkout', 'createBranch', 'checkoutCommit', 'undoCommit', 'branchDelete', 'fetch', 'pull', 'push', 'sync',
   'commitAll', 'stashPush', 'stashPop', 'stashDrop',
   'tagCreate', 'tagDelete', 'worktreeAdd', 'clone',
 ])
@@ -800,11 +800,27 @@ async function runWrite(ctx, op, payload) {
     }
     case 'commit': {
       const message = typeof payload.message === 'string' ? payload.message.trim() : ''
-      if (message === '') throw fail('empty-message', 'a commit message is required')
+      const amend = payload.amend === true
+      if (message === '' && !amend) throw fail('empty-message', 'a commit message is required')
       if (message.length > MAX_MESSAGE) throw fail('message-too-long', 'commit message too long')
-      const output = await git(root, ['commit', '-m', message], 60000)
+      const args = ['commit']
+      if (amend) args.push('--amend')
+      if (message !== '') args.push('-m', message)
+      else args.push('--no-edit')
+      const output = await git(root, args, 60000)
       const match = /\[[^\]]+ ([0-9a-f]{7,})\]/i.exec(output)
-      return { ok: true, message: 'committed', head: match ? match[1] : '' }
+      return { ok: true, message: amend ? 'amended' : 'committed', head: match ? match[1] : '' }
+    }
+    case 'undoCommit': {
+      // Undo the last commit but keep its changes staged (VS Code "Undo Last Commit").
+      const parents = (await gitOr(root, ['rev-list', '--parents', '-n', '1', 'HEAD'])).trim().split(/\s+/)
+      if (parents.length > 1) {
+        await git(root, ['reset', '--soft', 'HEAD~1'], 30000)
+      } else {
+        // Root commit: remove the branch pointer, keeping the index/worktree.
+        await git(root, ['update-ref', '-d', 'HEAD'], 30000)
+      }
+      return { ok: true, message: 'commit-undone' }
     }
     case 'checkout': {
       const branch = safeBranchName(payload.branch)
@@ -817,8 +833,17 @@ async function runWrite(ctx, op, payload) {
       const branch = safeBranchName(payload.branch)
       const list = await localBranches(root)
       if (list.includes(branch)) throw fail('branch-exists', 'branch already exists: ' + branch)
-      await git(root, ['checkout', '-b', branch], 60000)
+      const start = typeof payload.commit === 'string' && /^[0-9a-f]{7,40}$/i.test(payload.commit) ? payload.commit : ''
+      const args = ['checkout', '-b', branch]
+      if (start !== '') args.push(start)
+      await git(root, args, 60000)
       return { ok: true, message: 'created' }
+    }
+    case 'checkoutCommit': {
+      const commit = typeof payload.commit === 'string' && /^[0-9a-f]{7,40}$/i.test(payload.commit) ? payload.commit : ''
+      if (commit === '') throw fail('bad-commit', 'invalid commit hash')
+      await git(root, ['checkout', '--detach', commit], 60000)
+      return { ok: true, message: 'checked-out-detached' }
     }
     case 'fetch': {
       await git(root, ['fetch', '--prune'], NET_TIMEOUT)
@@ -839,12 +864,17 @@ async function runWrite(ctx, op, payload) {
     }
     case 'commitAll': {
       const message = typeof payload.message === 'string' ? payload.message.trim() : ''
-      if (message === '') throw fail('empty-message', 'a commit message is required')
+      const amend = payload.amend === true
+      if (message === '' && !amend) throw fail('empty-message', 'a commit message is required')
       if (message.length > MAX_MESSAGE) throw fail('message-too-long', 'commit message too long')
       await git(root, ['add', '-A', '--', '.'])
-      const output = await git(root, ['commit', '-m', message], 60000)
+      const args = ['commit']
+      if (amend) args.push('--amend')
+      if (message !== '') args.push('-m', message)
+      else args.push('--no-edit')
+      const output = await git(root, args, 60000)
       const match = /\[[^\]]+ ([0-9a-f]{7,})\]/i.exec(output)
-      return { ok: true, message: 'committed', head: match ? match[1] : '' }
+      return { ok: true, message: amend ? 'amended' : 'committed', head: match ? match[1] : '' }
     }
     case 'branchDelete': {
       const branch = safeBranchName(payload.branch)
@@ -998,6 +1028,54 @@ async function handleApi(ctx, req, url) {
       }
       tags.sort((a, b) => b.at - a.at)
       return { ok: true, tags }
+    }
+
+    if (op === 'commitDetail') {
+      if (!repo.isGit) throw fail('not-a-repo', 'the selected directory is not a git work tree')
+      const commit = typeof url.searchParams.get('commit') === 'string' ? url.searchParams.get('commit') : ''
+      if (!/^[0-9a-f]{4,40}$/i.test(commit)) throw fail('bad-commit', 'invalid commit hash')
+      const meta = await git(repo.root, ['show', '-s', '--format=%H%x1f%h%x1f%an%x1f%ae%x1f%at%x1f%cn%x1f%ce%x1f%ct%x1f%P%x1f%B', commit])
+      const parts = meta.replace(/\n$/, '').split('\x1f')
+      const [hash, short, an, ae, at, cn, ce, ct, parentsRaw, ...rest] = parts
+      const body = rest.join('\x1f')
+      const numstat = await gitOr(repo.root, ['show', '--no-color', '--numstat', '--format=', commit])
+      const files = []
+      for (const line of numstat.split('\n')) {
+        if (!line.trim()) continue
+        const [addRaw, delRaw, ...pathParts] = line.split('\t')
+        const path = pathParts.join('\t')
+        if (!path) continue
+        files.push({
+          path,
+          add: addRaw === '-' ? 0 : Number(addRaw) || 0,
+          del: delRaw === '-' ? 0 : Number(delRaw) || 0,
+          binary: addRaw === '-',
+        })
+      }
+      return {
+        ok: true,
+        commit: {
+          hash: hash || commit, short: short || commit.slice(0, 7),
+          author: an || '', authorEmail: ae || '', at: Number(at) * 1000 || 0,
+          committer: cn || '', committerEmail: ce || '', committedAt: Number(ct) * 1000 || 0,
+          parents: parentsRaw ? parentsRaw.split(' ').filter(Boolean) : [],
+          message: body.trim(),
+        },
+        files,
+      }
+    }
+
+    if (op === 'commitDiff') {
+      if (!repo.isGit) throw fail('not-a-repo', 'the selected directory is not a git work tree')
+      const commit = typeof url.searchParams.get('commit') === 'string' ? url.searchParams.get('commit') : ''
+      if (!/^[0-9a-f]{4,40}$/i.test(commit)) throw fail('bad-commit', 'invalid commit hash')
+      const pathParam = typeof url.searchParams.get('path') === 'string' ? url.searchParams.get('path') : ''
+      const rel = safeRelPath(pathParam)
+      let diff = await gitOr(repo.root, ['show', '--no-color', '--unified=3', commit, '--', rel])
+      if (diff === '') diff = await gitOr(repo.root, ['show', '--no-color', '--unified=3', '--first-parent', commit, '--', rel])
+      const truncated = diff.length > MAX_DIFF_CHARS
+      if (truncated) diff = diff.slice(0, MAX_DIFF_CHARS)
+      return { ok: true, commit, path: rel, diff, truncated }
     }
 
     if (op === 'worktrees') {
