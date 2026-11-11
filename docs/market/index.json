@@ -20,7 +20,7 @@
   },
   "plugins": [
     {
-      "name": "dsh-git-sidebar",
+      "name": "@hennychen/dsh-git-sidebar",
       "title": {
         "en": "Git Source Control",
         "zh": "Git 源代码管理"
@@ -29,7 +29,7 @@
         "en": "VS Code style multi-repository Source Control in the right sidebar: repositories with branch/ahead-behind/sync, changes with staging and commit, and the commit graph.",
         "zh": "右侧边栏的 VS Code 风格多存储库源代码管理：存储库列表（分支/领先落后/同步）、更改暂存与提交、提交图形。"
       },
-      "icon": "icons/dsh-git-sidebar.svg",
+      "icon": "icons/hennychen-dsh-git-sidebar.svg",
       "author": "hennychen",
       "homepage": "https://github.com/hennychen/dsh-git-sidebar#readme",
       "repository": {
@@ -49,84 +49,24 @@
       },
       "versions": [
         {
-          "version": "0.8.0",
-          "publishTimestamp": 1793870834,
+          "version": "0.8.2",
+          "publishTimestamp": 1794389132,
           "source": {
             "type": "git",
             "url": "https://github.com/hennychen/dsh-git-sidebar",
-            "commit": "02faef2d986d70e126cab050366a7180edd33402"
+            "commit": "77e5a50445dd71219f23b30309a099f3f6c4e72e"
           },
           "engines": {
             "dsh": ">=0.2.0-rc.2 <0.3.0"
           }
         },
         {
-          "version": "0.7.4",
-          "publishTimestamp": 1793784210,
+          "version": "0.8.1",
+          "publishTimestamp": 1793946628,
           "source": {
             "type": "git",
             "url": "https://github.com/hennychen/dsh-git-sidebar",
-            "commit": "75ad3f9bc20884c3accf132cb57ef015d0a592d1"
-          },
-          "engines": {
-            "dsh": ">=0.2.0-rc.2 <0.3.0"
-          }
-        },
-        {
-          "version": "0.7.3",
-          "publishTimestamp": 1793578489,
-          "source": {
-            "type": "git",
-            "url": "https://github.com/hennychen/dsh-git-sidebar",
-            "commit": "0da68044e60ab03df17a23587216b4a1aa458907"
-          },
-          "engines": {
-            "dsh": ">=0.2.0-rc.2 <0.3.0"
-          }
-        },
-        {
-          "version": "0.7.2",
-          "publishTimestamp": 1793578413,
-          "source": {
-            "type": "git",
-            "url": "https://github.com/hennychen/dsh-git-sidebar",
-            "commit": "1da45bb775e81248a2cc46b52aa11230539aa9c2"
-          },
-          "engines": {
-            "dsh": ">=0.2.0-rc.2 <0.3.0"
-          }
-        },
-        {
-          "version": "0.7.1",
-          "publishTimestamp": 1793520060,
-          "source": {
-            "type": "git",
-            "url": "https://github.com/hennychen/dsh-git-sidebar",
-            "commit": "1e6cb11446923240b110bde0113f300545eb79cc"
-          },
-          "engines": {
-            "dsh": ">=0.2.0-rc.2 <0.3.0"
-          }
-        },
-        {
-          "version": "0.6.5",
-          "publishTimestamp": 1793516501,
-          "source": {
-            "type": "git",
-            "url": "https://github.com/hennychen/dsh-git-sidebar",
-            "commit": "34942db99c3513ec32f5b0198000d0f32b4ad78f"
-          },
-          "engines": {
-            "dsh": ">=0.2.0-rc.2 <0.3.0"
-          }
-        },
-        {
-          "version": "0.6.4",
-          "publishTimestamp": 1793500813,
-          "source": {
-            "type": "git",
-            "url": "https://github.com/hennychen/dsh-git-sidebar",
-            "commit": "ee512237ad2789c25e23c445317e8710e927f1c1"
+            "commit": "f42ffd5b85c708987bbb55a68562d6cf19ecd3ca"
           },
           "engines": {
             "dsh": ">=0.2.0-rc.2 <0.3.0"

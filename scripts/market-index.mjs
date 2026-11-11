@@ -141,13 +141,18 @@ for (const tag of tags) {
 
 if (versions.size === 0) fail('no tag declares dsh.bundle together with engines.dsh')
 
-const ordered = [...versions.values()].sort((left, right) => compareVersions(right.version, left.version))
-const top = ordered[0]
+const orderedAll = [...versions.values()].sort((left, right) => compareVersions(right.version, left.version))
+const top = orderedAll[0]
 const name = top.manifest.name
 if (typeof name !== 'string' || name.trim() === '' || /\s/.test(name) || name.length > 214) fail('invalid package name')
 
-for (const entry of ordered) {
-  if (entry.manifest.name !== name) fail('inconsistent package name across versions: ' + entry.manifest.name)
+// The project was renamed to a scoped npm name at v0.8.1. The index has one
+// plugin name, so keep the newest name group and drop pre-rename versions
+// (they stay installable by tag).
+const ordered = []
+for (const entry of orderedAll) {
+  if (entry.manifest.name === name) ordered.push(entry)
+  else console.warn('drop ' + entry.version + ': package was renamed to ' + name)
 }
 
 // ---------- display metadata from the highest listed version ----------
