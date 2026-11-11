@@ -2228,19 +2228,7 @@ window.__ModuleLoader__.load({
           banner,
           gitOutputOverlay,
           dialogOverlay,
-          h('div', { className: 'gs-body' }, reposSection, changesSection, graphSection),
-          h('div', { className: 'gs-foot' },
-            h('button', { type: 'button', className: 'gs-btn', disabled: busy || !activeRepo, onClick: () => activeRepo && act(activeRepo.path, 'fetch') }, tr('action.fetch')),
-            h('button', { type: 'button', className: 'gs-btn', disabled: busy || !activeRepo, onClick: () => activeRepo && act(activeRepo.path, 'pull') }, tr('action.pull')),
-            h('span', { className: 'gs-spacer' }),
-            h('button', {
-              type: 'button', className: 'gs-btn', disabled: busy || !activeRepo,
-              onClick: () => {
-                if (!activeRepo) return
-                if (typeof window !== 'undefined' && !window.confirm(tr('confirm.push'))) return
-                act(activeRepo.path, 'push')
-              },
-            }, tr('action.push'))))
+          h('div', { className: 'gs-body' }, reposSection, changesSection, graphSection))
       }
 
       function Wrapped(props) {
