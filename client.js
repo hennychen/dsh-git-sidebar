@@ -133,6 +133,11 @@ window.__ModuleLoader__.load({
       'msg.worktreeAdd': '已创建工作树',
       'msg.clone': '已克隆仓库',
       'empty.noRepos': '没有可管理的 Git 存储库',
+      'repos.manage': '管理显示',
+      'repos.showAll': '全部显示',
+      'repos.onlyChanged': '仅显示有更改',
+      'repos.hiddenAll': '已隐藏全部存储库',
+      'repos.visibleOf': '显示的存储库',
       'empty.loading': '正在读取存储库…',
       'empty.clean': '没有更改',
       'empty.graph': '暂无提交',
@@ -268,6 +273,11 @@ window.__ModuleLoader__.load({
       'msg.worktreeAdd': 'Worktree created',
       'msg.clone': 'Repository cloned',
       'empty.noRepos': 'No Git repository to manage',
+      'repos.manage': 'Manage visibility',
+      'repos.showAll': 'Show all',
+      'repos.onlyChanged': 'Only with changes',
+      'repos.hiddenAll': 'All repositories are hidden',
+      'repos.visibleOf': 'Visible repositories',
       'empty.loading': 'Reading repositories…',
       'empty.clean': 'No changes',
       'empty.graph': 'No commits yet',
@@ -507,6 +517,8 @@ window.__ModuleLoader__.load({
       chevronDown: ['M4.5 6.5L8 10l3.5-3.5'],
       chevronRight: ['M6.5 4.5L10 8l-3.5 3.5'],
       clock: ['M8 13.5a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11z', 'M8 4.8V8l2.2 1.4'],
+      eye: ['M1.8 8s2.2-4.2 6.2-4.2S14.2 8 14.2 8 12 12.2 8 12.2 1.8 8 1.8 8z', 'M8 10.1a2.1 2.1 0 1 0 0-4.2 2.1 2.1 0 0 0 0 4.2z'],
+      eyeOff: ['M2 2l12 12', 'M6.4 4.1A6.6 6.6 0 0 1 8 3.8c4 0 6.2 4.2 6.2 4.2a12 12 0 0 1-2 2.4', 'M4.2 5.3A11 11 0 0 0 1.8 8S4 12.2 8 12.2c.7 0 1.4-.1 2-.4'],
     }
 
     function FileGlyph() {
@@ -838,6 +850,8 @@ window.__ModuleLoader__.load({
         const [sort, setSort] = useState('discovered')
         const [sections, setSections] = useState({ repos: true, changes: true, graph: true })
         const [included, setIncluded] = useState([])
+        const [hiddenRepos, setHiddenRepos] = useState([])
+        const [repoPickerOpen, setRepoPickerOpen] = useState(false)
         const [info, setInfo] = useState(null)
         const [multi, setMulti] = useState({})
         const [graph, setGraph] = useState(null)
@@ -901,6 +915,7 @@ window.__ModuleLoader__.load({
               })
             }
             if (Array.isArray(saved.included)) setIncluded(saved.included)
+            if (Array.isArray(saved.hiddenRepos)) setHiddenRepos(saved.hiddenRepos)
             if (saved.graphRefs && typeof saved.graphRefs === 'object' && !Array.isArray(saved.graphRefs)) {
               setGraphRefs(saved.graphRefs)
             }
@@ -999,11 +1014,18 @@ window.__ModuleLoader__.load({
           return list
         }, [repos, sort])
 
+        const hiddenRepoSet = useMemo(() => new Set(hiddenRepos), [hiddenRepos])
+        const visibleRepos = useMemo(() => sortedRepos.filter((repo) => !hiddenRepoSet.has(repo.path)), [sortedRepos, hiddenRepoSet])
+
         const activeRepo = useMemo(() => {
-          if (activeRoot !== '') return (repos || []).find((repo) => repo.path === activeRoot) || null
-          if (repos && repos.length > 0) return sortedRepos[0] || null
-          return null
-        }, [repos, sortedRepos, activeRoot])
+          if (activeRoot !== '') {
+            const found = (repos || []).find((repo) => repo.path === activeRoot)
+            // A hidden repository is not a valid active selection; fall through
+            // to the first visible one so the list and changes stay in sync.
+            if (found && !hiddenRepoSet.has(found.path)) return found
+          }
+          return visibleRepos[0] || sortedRepos[0] || null
+        }, [repos, sortedRepos, visibleRepos, activeRoot, hiddenRepoSet])
 
         const refreshMulti = useCallback(async () => {
           const list = (repos || []).filter((repo) => included.includes(repo.path)).slice(0, 6)
@@ -1298,6 +1320,38 @@ window.__ModuleLoader__.load({
             persist({ included: next })
             return next
           })
+        }
+
+        const applyHiddenRepos = useCallback((next) => {
+          setHiddenRepos(next)
+          persist({ hiddenRepos: next })
+          if (next.includes(activeRoot)) {
+            const fallback = sortedRepos.find((repo) => !next.includes(repo.path))
+            const root = fallback ? fallback.path : ''
+            setActiveRoot(root)
+            persist({ activeRoot: root })
+            setInfo(null)
+            setGraph(null)
+          }
+        }, [activeRoot, sortedRepos, persist])
+
+        const toggleRepoHidden = (repo) => {
+          const next = hiddenRepos.includes(repo.path)
+            ? hiddenRepos.filter((path) => path !== repo.path)
+            : hiddenRepos.concat([repo.path])
+          applyHiddenRepos(next)
+        }
+
+        const showAllRepos = () => {
+          setHiddenRepos([])
+          persist({ hiddenRepos: [] })
+        }
+
+        const hideCleanRepos = () => {
+          const next = sortedRepos
+            .filter((repo) => ((repo.counts && repo.counts.total) || 0) === 0)
+            .map((repo) => repo.path)
+          applyHiddenRepos(next)
         }
 
         const setModeAndPersist = (next) => {
@@ -1807,17 +1861,49 @@ window.__ModuleLoader__.load({
           ? h('div', { className: 'gs-banner' }, error)
           : notice ? h('div', { className: 'gs-banner gs-banner-ok' }, notice) : null
 
+        const repoPickerPanel = sections.repos && repoPickerOpen && (repos || []).length > 0
+          ? h('div', { className: 'gs-gpanel' },
+            h('div', { className: 'gs-gpanel-quick' },
+              h('button', { type: 'button', className: 'gs-btn', onClick: showAllRepos }, tr('repos.showAll')),
+              h('button', { type: 'button', className: 'gs-btn', onClick: hideCleanRepos }, tr('repos.onlyChanged'))),
+            sortedRepos.map((repo) => {
+              const visible = !hiddenRepoSet.has(repo.path)
+              return h('button', {
+                key: repo.path, type: 'button', className: 'gs-menu-item', title: repo.path,
+                onClick: () => toggleRepoHidden(repo),
+              },
+                h('span', { className: 'gs-cb' + (visible ? ' gs-cb-on' : '') },
+                  visible ? h(Glyph, { d: ICON.check, size: 9 }) : null),
+                h('span', { className: 'gs-gbranch-name' }, repo.name),
+                h('span', { className: 'gs-ab' }, String((repo.counts && repo.counts.total) || 0)))
+            }))
+          : null
+
         const reposSection = sections.repos
           ? h('div', { className: 'gs-group', key: 'repos' },
-            sectionHead('repos', tr('section.repos'), (repos || []).length,
-              iconButton('refresh', tr('action.refresh'), refreshRepos, busy),
+            sectionHead('repos', tr('section.repos'),
+              (repos || []).length > 0 && visibleRepos.length !== (repos || []).length
+                ? visibleRepos.length + '/' + (repos || []).length
+                : (repos || []).length,
+              h('span', { className: 'gs-group-actions' },
+                iconButton(repoPickerOpen ? 'eyeOff' : 'eye', tr('repos.manage'), () => setRepoPickerOpen((open) => !open)),
+                iconButton('refresh', tr('action.refresh'), refreshRepos, busy)),
               reposOpen, () => setReposOpen((open) => !open)),
             reposOpen
-              ? (loading && repos === null
-                ? h('div', { className: 'gs-empty' }, tr('empty.loading'))
-                : (repos || []).length === 0
-                  ? h('div', { className: 'gs-empty' }, reposError || tr('empty.noRepos'))
-                  : sortedRepos.map(repoRow))
+              ? h(React.Fragment, null,
+                repoPickerPanel,
+                loading && repos === null
+                  ? h('div', { className: 'gs-empty' }, tr('empty.loading'))
+                  : (repos || []).length === 0
+                    ? h('div', { className: 'gs-empty' }, reposError || tr('empty.noRepos'))
+                    : visibleRepos.length === 0
+                      ? h('div', { className: 'gs-empty' },
+                        h('span', null, tr('repos.hiddenAll')),
+                        h('button', {
+                          type: 'button', className: 'gs-btn', style: { marginLeft: '6px' },
+                          onClick: showAllRepos,
+                        }, tr('repos.showAll')))
+                      : visibleRepos.map(repoRow))
               : null)
           : null
 
