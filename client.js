@@ -892,6 +892,7 @@ window.__ModuleLoader__.load({
         /** '' | 'repo' | 'branch' — which inline picker below the graph header is open */
         const [graphMenu, setGraphMenu] = useState('')
         const rootRef = useRef(null)
+        const activeRootRef = useRef('')
         const menuRef = useRef(null)
         const persistKey = 'dsh-git-sidebar:v6:' + sid
 
@@ -915,7 +916,9 @@ window.__ModuleLoader__.load({
               })
             }
             if (Array.isArray(saved.included)) setIncluded(saved.included)
-            if (Array.isArray(saved.hiddenRepos)) setHiddenRepos(saved.hiddenRepos)
+            if (Array.isArray(saved.hiddenRepos)) {
+              setHiddenRepos(saved.hiddenRepos.filter((path) => typeof path === 'string'))
+            }
             if (saved.graphRefs && typeof saved.graphRefs === 'object' && !Array.isArray(saved.graphRefs)) {
               setGraphRefs(saved.graphRefs)
             }
@@ -997,9 +1000,11 @@ window.__ModuleLoader__.load({
           if (sid === '') return null
           try {
             const result = await apiInfo(sid, root || '')
+            // A slow response for a repository the user already switched away
+            // from must not overwrite the current one (hide/select can switch).
+            if (root !== '' && root !== activeRootRef.current) return null
             if (result && result.ok) {
-              if (!root || result.pinned) setInfo(result)
-              else setInfo(result)
+              setInfo(result)
               return result
             }
           } catch { /* ignore */ }
@@ -1024,8 +1029,10 @@ window.__ModuleLoader__.load({
             // to the first visible one so the list and changes stay in sync.
             if (found && !hiddenRepoSet.has(found.path)) return found
           }
-          return visibleRepos[0] || sortedRepos[0] || null
+          return visibleRepos[0] || null
         }, [repos, sortedRepos, visibleRepos, activeRoot, hiddenRepoSet])
+
+        activeRootRef.current = activeRepo ? activeRepo.path : ''
 
         const refreshMulti = useCallback(async () => {
           const list = (repos || []).filter((repo) => included.includes(repo.path)).slice(0, 6)
@@ -1305,6 +1312,13 @@ window.__ModuleLoader__.load({
 
         const selectRepo = (repo) => {
           if (busy) return
+          // Selecting a hidden repository must reveal it, otherwise the active
+          // selection would immediately fall back to a visible one.
+          if (hiddenRepos.includes(repo.path)) {
+            const next = hiddenRepos.filter((path) => path !== repo.path)
+            setHiddenRepos(next)
+            persist({ hiddenRepos: next })
+          }
           setActiveRoot(repo.path)
           persist({ activeRoot: repo.path })
           setInfo(null)
@@ -1886,7 +1900,9 @@ window.__ModuleLoader__.load({
                 ? visibleRepos.length + '/' + (repos || []).length
                 : (repos || []).length,
               h('span', { className: 'gs-group-actions' },
-                iconButton(repoPickerOpen ? 'eyeOff' : 'eye', tr('repos.manage'), () => setRepoPickerOpen((open) => !open)),
+                iconButton(repoPickerOpen ? 'eyeOff' : 'eye',
+                  tr('repos.manage') + ' · ' + visibleRepos.length + '/' + (repos || []).length,
+                  () => setRepoPickerOpen((open) => !open)),
                 iconButton('refresh', tr('action.refresh'), refreshRepos, busy)),
               reposOpen, () => setReposOpen((open) => !open)),
             reposOpen
@@ -1909,7 +1925,11 @@ window.__ModuleLoader__.load({
 
         let changesBody = null
         if (mode === 'multiple') {
-          changesBody = (repos || []).filter((repo) => included.includes(repo.path)).slice(0, 6).map((repo) => {
+          const multiRepos = (repos || []).filter((repo) => included.includes(repo.path) && !hiddenRepoSet.has(repo.path)).slice(0, 6)
+          changesBody = multiRepos.length === 0
+            ? h('div', { className: 'gs-empty' },
+              (repos || []).length > 0 && visibleRepos.length === 0 ? tr('repos.hiddenAll') : tr('empty.noRepos'))
+            : multiRepos.map((repo) => {
             const target = multi[repo.path]
             return h('div', { className: 'gs-sub', key: 'multi:' + repo.path },
               h('div', { className: 'gs-sub-head' },
@@ -1925,7 +1945,8 @@ window.__ModuleLoader__.load({
                 : h('div', { className: 'gs-empty' }, tr('empty.loading')))
           })
         } else if (activeRepo === null) {
-          changesBody = h('div', { className: 'gs-empty' }, tr('empty.noRepos'))
+          changesBody = h('div', { className: 'gs-empty' },
+            (repos || []).length > 0 && visibleRepos.length === 0 ? tr('repos.hiddenAll') : tr('empty.noRepos'))
         } else if (info !== null && info.isGit && info.repo && info.repo.root === activeRepo.path) {
           if (changesView === 'tree') {
             changesBody = h('div', { className: 'gs-sub', key: 'active-tree' },
@@ -2203,7 +2224,9 @@ window.__ModuleLoader__.load({
               : null)
           : null
 
-        const graphBody = graph === null || graph.root !== (activeRepo ? activeRepo.path : '')
+        const graphBody = activeRepo === null && (repos || []).length > 0 && visibleRepos.length === 0
+          ? h('div', { className: 'gs-empty' }, tr('repos.hiddenAll'))
+          : graph === null || graph.root !== (activeRepo ? activeRepo.path : '')
           ? h('div', { className: 'gs-empty' }, tr('empty.loading'))
           : graphExplicitRefs !== null && graphExplicitRefs.length === 0
             ? h('div', { className: 'gs-empty' }, tr('graph.noneSelected'))
