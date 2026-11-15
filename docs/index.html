@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>dsh-git-sidebar — DeepSeek Harness 右侧边栏 Git 源代码管理</title>
-<meta name="description" content="VS Code 式多存储库 Git 源代码管理面板，装在 DeepSeek Harness 桌面端 Web GUI 的右侧边栏：存储库列表、暂存/提交、内联 diff、提交图形、拉取/推送/同步。">
+<meta name="description" content="VS Code 式多存储库 Git 源代码管理面板，装在 DeepSeek Harness 桌面端 Web GUI 的右侧边栏：存储库显示管理、暂存/提交、内联 diff、提交图形与提交详情、拉取/推送/同步。">
 <meta name="theme-color" content="#0d1117">
 <meta property="og:type" content="website">
 <meta property="og:title" content="dsh-git-sidebar — VS Code 式 Git 源代码管理">
-<meta property="og:description" content="DeepSeek Harness 右侧边栏的多存储库 Git 管理面板：存储库列表、暂存/提交、内联 diff、SVG 提交图形。">
+<meta property="og:description" content="DeepSeek Harness 右侧边栏的多存储库 Git 管理面板：存储库显示管理、暂存/提交、内联 diff、SVG 提交图形与提交详情。">
 <meta property="og:image" content="https://hennychen.github.io/dsh-git-sidebar/cover.png">
 <meta property="og:url" content="https://hennychen.github.io/dsh-git-sidebar/">
 <meta name="twitter:card" content="summary_large_image">
@@ -55,12 +55,19 @@
   }
   .logo svg { display: block; }
   .brand h2 { font-size: 17px; margin: 0; font-weight: 600; font-family: var(--mono); }
-  .badges { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+  .badges { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; align-items: center; }
   .badge {
     border: 1px solid var(--border); background: #121821; color: var(--dim);
     border-radius: 999px; padding: 3px 12px; font-size: 12px; white-space: nowrap;
   }
   .badge.blue { color: var(--blue); border-color: #1f3a5f; }
+  .lang { display: flex; gap: 2px; border: 1px solid var(--border); border-radius: 999px; padding: 2px; }
+  .lang button {
+    border: 0; background: transparent; color: var(--dim); font: inherit; font-size: 12px;
+    padding: 2px 10px; border-radius: 999px; cursor: pointer;
+  }
+  .lang button:hover { color: var(--text); }
+  .lang button.on { background: var(--blue-2); color: #fff; }
 
   .hero { padding: 64px 0 24px; display: grid; grid-template-columns: 1.05fr .95fr; gap: 44px; align-items: center; }
   .hero h1 { font-size: clamp(30px, 4vw, 46px); line-height: 1.22; margin: 0 0 18px; letter-spacing: -.01em; }
@@ -138,7 +145,11 @@
       <div class="badges">
         <span class="badge blue">dsh-plugin</span>
         <span class="badge">Apache-2.0</span>
-        <span class="badge">v0.6.4</span>
+        <span class="badge">v0.8.6</span>
+        <div class="lang" role="group" aria-label="Language / 语言">
+          <button type="button" data-lang-btn="zh" class="on">中文</button>
+          <button type="button" data-lang-btn="en">English</button>
+        </div>
       </div>
     </div>
   </div>
@@ -147,100 +158,100 @@
 <main class="wrap">
   <section class="hero" style="border-top:0">
     <div>
-      <h1><span class="accent">Git 源代码管理</span><br>就在 DeepSeek Harness 右侧边栏</h1>
-      <p class="lead">
+      <h1 data-i18n-html="hero.title"><span class="accent">Git 源代码管理</span><br>就在 DeepSeek Harness 右侧边栏</h1>
+      <p class="lead" data-i18n-html="hero.lead">
         VS Code <em>Source Control</em> 式的多存储库面板：自动发现会话目录、嵌套仓库与已注册工作区，
-        逐文件暂存/放弃、内联 diff、提交、分支、拉取/推送/同步，还有 SVG 提交图形。
+        逐文件暂存/放弃、内联 diff、提交（含 Amend 与撤销）、分支、拉取/推送/同步，还有可展开提交详情的 SVG 提交图形。
       </p>
       <div class="cta">
-        <a class="btn primary" href="#install">安装</a>
+        <a class="btn primary" href="#install" data-i18n="hero.install">安装</a>
         <a class="btn" href="https://github.com/hennychen/dsh-git-sidebar">GitHub 仓库</a>
-        <a class="btn" href="https://github.com/hennychen/dsh-git-sidebar/blob/main/README.md">文档</a>
+        <a class="btn" href="https://github.com/hennychen/dsh-git-sidebar/blob/main/README.md" data-readme data-i18n="hero.docs">文档</a>
       </div>
     </div>
     <figure class="hero-figure">
       <img src="cover.png" alt="dsh-git-sidebar 封面：左侧标题与特性，右侧源代码管理面板示意">
-      <figcaption>右侧边栏 · 多存储库 · 暂存 / 提交 / 分支 / 图形</figcaption>
+      <figcaption data-i18n="hero.caption">右侧边栏 · 多存储库 · 暂存 / 提交 / 分支 / 图形</figcaption>
     </figure>
   </section>
 
   <section>
-    <h2>功能</h2>
-    <p class="sub">对齐 VS Code 的 Source Control 布局，同时适配右侧边栏的窄宽度。</p>
+    <h2 data-i18n="features.title">功能</h2>
+    <p class="sub" data-i18n="features.sub">对齐 VS Code 的 Source Control 布局，同时适配右侧边栏的窄宽度。</p>
     <div class="grid">
       <div class="card">
-        <div class="k"><span class="dot" style="background:var(--blue)"></span>多存储库</div>
-        <p>会话目录、其下嵌套仓库、已注册工作区里的所有 Git 仓库一处列出，带分支、领先/落后与同步。</p>
+        <div class="k"><span class="dot" style="background:var(--blue)"></span><span data-i18n="f1.title">多存储库</span></div>
+        <p data-i18n="f1.body">会话目录、其下嵌套仓库、已注册工作区里的 Git 仓库一处列出；每行带分支、领先/落后与同步。标题栏眼睛按钮可逐仓库显示/隐藏，或只看有更改的仓库。</p>
       </div>
       <div class="card">
-        <div class="k"><span class="dot" style="background:var(--green)"></span>暂存与提交</div>
-        <p>更改 / 暂存的更改分组，逐文件暂存、取消暂存、放弃；提交框支持 ⌘Enter，按仓库独立提交。</p>
+        <div class="k"><span class="dot" style="background:var(--green)"></span><span data-i18n="f2.title">暂存与提交</span></div>
+        <p data-i18n="f2.body">更改 / 暂存的更改分组，逐文件暂存、取消暂存、放弃；提交按钮带下拉（提交全部 / 提交并推送 / Amend / 撤销上次提交），并保留每仓库最近 20 条提交信息历史。</p>
       </div>
       <div class="card">
-        <div class="k"><span class="dot" style="background:var(--orange)"></span>内联 diff</div>
-        <p>点击文件行展开统一 diff，+/- 着色、hunk 头；未跟踪文件合成新增对比，二进制与超长文件有提示。</p>
+        <div class="k"><span class="dot" style="background:var(--orange)"></span><span data-i18n="f3.title">内联 diff</span></div>
+        <p data-i18n="f3.body">点击文件行展开统一 diff，+/- 着色、hunk 头；未跟踪文件合成新增对比，二进制与超长文件有提示。文件列表支持筛选与树/列表视图。</p>
       </div>
       <div class="card">
-        <div class="k"><span class="dot" style="background:var(--purple)"></span>SVG 提交图形</div>
-        <p>车道式提交图：每条分支一种颜色，节点与父提交连线，右侧短 hash、提交信息与 refs。</p>
+        <div class="k"><span class="dot" style="background:var(--purple)"></span><span data-i18n="f4.title">提交图形</span></div>
+        <p data-i18n="f4.body">SVG 车道图：父提交连线、合并节点空心双环；分支多选与图例、提交筛选。点击任意提交展开详情（变更文件 +N/-N、单文件 diff），可签出、建分支或打标记。</p>
       </div>
       <div class="card">
-        <div class="k"><span class="dot" style="background:#39c5cf"></span>远端操作</div>
-        <p>获取 / 拉取 / 推送 / 同步，按仓库执行；分支胶囊点开即可切换或新建分支。</p>
+        <div class="k"><span class="dot" style="background:#39c5cf"></span><span data-i18n="f5.title">仓库操作</span></div>
+        <p data-i18n="f5.body">获取 / 拉取 / 推送 / 同步、分支切换与新建/删除、储藏、标记、工作树、克隆，以及最近 60 条命令的 GIT 输出查看器。</p>
       </div>
       <div class="card">
-        <div class="k"><span class="dot" style="background:#ff7b72"></span>安全边界</div>
-        <p>仓库始终由会话目录推导；root 覆盖只允许会话目录或已注册工作区内的路径，越界直接拒绝。</p>
+        <div class="k"><span class="dot" style="background:#ff7b72"></span><span data-i18n="f6.title">安全边界</span></div>
+        <p data-i18n="f6.body">仓库始终由会话目录推导；root 覆盖只允许会话目录或已注册工作区内的路径，越界直接拒绝。</p>
       </div>
     </div>
   </section>
 
   <section id="install">
-    <h2>安装</h2>
-    <p class="sub">任选一种；安装后在「设置 → 插件」里确认 bundle 已启用，右侧边栏 <code>+</code> 会出现「源代码管理」。</p>
+    <h2 data-i18n="install.title">安装</h2>
+    <p class="sub" data-i18n-html="install.sub">任选一种；安装后在「设置 → 插件」里确认 bundle 已启用，右侧边栏 <code>+</code> 会出现「源代码管理」。</p>
     <div class="install-grid">
       <div>
-        <h3>① 从 GitHub 直接安装</h3>
-        <p>在终端里把本仓库作为 bundle 装进 profile：</p>
+        <h3 data-i18n="install.gitTitle">① 从 GitHub 直接安装</h3>
+        <p data-i18n="install.gitBody">在终端里把本仓库作为 bundle 装进 profile：</p>
         <div class="code-row">
           <pre class="code">dsh plugin --profile desktop add github:hennychen/dsh-git-sidebar</pre>
-          <button class="copy" data-copy="dsh plugin --profile desktop add github:hennychen/dsh-git-sidebar" title="复制">⧉</button>
+          <button class="copy" data-copy="dsh plugin --profile desktop add github:hennychen/dsh-git-sidebar" data-i18n-title="ui.copy" title="复制">⧉</button>
         </div>
-        <p style="margin-top:12px">也可以本地开发挂载：<code>dsh plugin --profile desktop add link:/path/to/repo</code>。</p>
+        <p style="margin-top:12px" data-i18n-html="install.linkNote">也可以本地开发挂载：<code>dsh plugin --profile desktop add link:/path/to/repo</code>。</p>
       </div>
       <div>
-        <h3>② 通过插件市场</h3>
+        <h3 data-i18n="install.marketTitle">② 通过插件市场</h3>
         <ol class="steps">
-          <li>设置 → 插件 → 实验性插件 → 更多 → 打开「自定义插件市场」</li>
-          <li>「发现」→「添加索引源」→ 粘贴下面的索引地址</li>
-          <li>在卡片里安装，确认来源为 Git 仓库与固定提交</li>
+          <li data-i18n="install.step1">设置 → 插件 → 实验性插件 → 更多 → 打开「自定义插件市场」</li>
+          <li data-i18n="install.step2">「发现」→「添加索引源」→ 粘贴下面的索引地址</li>
+          <li data-i18n="install.step3">在卡片里安装，确认来源为 Git 仓库与固定提交</li>
         </ol>
         <div class="code-row" style="margin-top:12px">
           <pre class="code">https://hennychen.github.io/dsh-git-sidebar/market/index.json</pre>
-          <button class="copy" data-copy="https://hennychen.github.io/dsh-git-sidebar/market/index.json" title="复制">⧉</button>
+          <button class="copy" data-copy="https://hennychen.github.io/dsh-git-sidebar/market/index.json" data-i18n-title="ui.copy" title="复制">⧉</button>
         </div>
       </div>
     </div>
   </section>
 
   <section>
-    <h2>截图</h2>
-    <p class="sub">右侧边栏里的多存储库源代码管理：存储库 / 更改 / 图形三段。</p>
+    <h2 data-i18n="shot.title">截图</h2>
+    <p class="sub" data-i18n="shot.sub">右侧边栏里的多存储库源代码管理：存储库 / 更改 / 图形三段。</p>
     <figure class="shot">
       <img src="panel.png" alt="右侧边栏中的 dsh-git-sidebar 面板：存储库列表、更改与图形">
-      <figcaption>存储库 5 · 更改 · 图形（提交历史与分支走向）</figcaption>
+      <figcaption data-i18n="shot.caption">存储库 5 · 更改 · 图形（提交历史与分支走向）</figcaption>
     </figure>
   </section>
 
   <section>
-    <h2>资源</h2>
+    <h2 data-i18n="res.title">资源</h2>
     <div class="resources">
       <a class="btn" href="https://github.com/hennychen/dsh-git-sidebar">GitHub</a>
-      <a class="btn" href="https://github.com/hennychen/dsh-git-sidebar/blob/main/README.md">README</a>
+      <a class="btn" href="https://github.com/hennychen/dsh-git-sidebar/blob/main/README.md" data-readme data-i18n="res.readme">README</a>
       <a class="btn" href="https://github.com/hennychen/dsh-git-sidebar/blob/main/LICENSE">LICENSE</a>
-      <a class="btn" href="market/index.json">插件市场索引</a>
-      <a class="btn" href="cover-3x2.png">封面 3:2</a>
-      <a class="btn" href="cover-square.png">封面方形</a>
+      <a class="btn" href="market/index.json" data-i18n="res.market">插件市场索引</a>
+      <a class="btn" href="cover-3x2.png" data-i18n="res.cover32">封面 3:2</a>
+      <a class="btn" href="cover-square.png" data-i18n="res.coverSq">封面方形</a>
     </div>
   </section>
 </main>
@@ -249,12 +260,149 @@
   <div class="wrap row">
     <span>© 2026 hennychen</span>
     <span>Apache-2.0</span>
-    <span>DeepSeek Harness 插件（dsh-plugin）</span>
+    <span data-i18n="footer.plugin">DeepSeek Harness 插件（dsh-plugin）</span>
     <span style="margin-left:auto"><a href="https://github.com/hennychen/dsh-git-sidebar">github.com/hennychen/dsh-git-sidebar</a></span>
   </div>
 </footer>
 
 <script>
+  var I18N = {
+    zh: {
+      'meta.title': 'dsh-git-sidebar — DeepSeek Harness 右侧边栏 Git 源代码管理',
+      'meta.desc': 'VS Code 式多存储库 Git 源代码管理面板，装在 DeepSeek Harness 桌面端 Web GUI 的右侧边栏：存储库显示管理、暂存/提交、内联 diff、提交图形与提交详情、拉取/推送/同步。',
+      'hero.title': '<span class="accent">Git 源代码管理</span><br>就在 DeepSeek Harness 右侧边栏',
+      'hero.lead': 'VS Code <em>Source Control</em> 式的多存储库面板：自动发现会话目录、嵌套仓库与已注册工作区，逐文件暂存/放弃、内联 diff、提交（含 Amend 与撤销）、分支、拉取/推送/同步，还有可展开提交详情的 SVG 提交图形。',
+      'hero.install': '安装',
+      'hero.docs': '文档',
+      'hero.caption': '右侧边栏 · 多存储库 · 暂存 / 提交 / 分支 / 图形',
+      'features.title': '功能',
+      'features.sub': '对齐 VS Code 的 Source Control 布局，同时适配右侧边栏的窄宽度。',
+      'f1.title': '多存储库',
+      'f1.body': '会话目录、其下嵌套仓库、已注册工作区里的 Git 仓库一处列出；每行带分支、领先/落后与同步。标题栏眼睛按钮可逐仓库显示/隐藏，或只看有更改的仓库。',
+      'f2.title': '暂存与提交',
+      'f2.body': '更改 / 暂存的更改分组，逐文件暂存、取消暂存、放弃；提交按钮带下拉（提交全部 / 提交并推送 / Amend / 撤销上次提交），并保留每仓库最近 20 条提交信息历史。',
+      'f3.title': '内联 diff',
+      'f3.body': '点击文件行展开统一 diff，+/- 着色、hunk 头；未跟踪文件合成新增对比，二进制与超长文件有提示。文件列表支持筛选与树/列表视图。',
+      'f4.title': '提交图形',
+      'f4.body': 'SVG 车道图：父提交连线、合并节点空心双环；分支多选与图例、提交筛选。点击任意提交展开详情（变更文件 +N/-N、单文件 diff），可签出、建分支或打标记。',
+      'f5.title': '仓库操作',
+      'f5.body': '获取 / 拉取 / 推送 / 同步、分支切换与新建/删除、储藏、标记、工作树、克隆，以及最近 60 条命令的 GIT 输出查看器。',
+      'f6.title': '安全边界',
+      'f6.body': '仓库始终由会话目录推导；root 覆盖只允许会话目录或已注册工作区内的路径，越界直接拒绝。',
+      'install.title': '安装',
+      'install.sub': '任选一种；安装后在「设置 → 插件」里确认 bundle 已启用，右侧边栏 <code>+</code> 会出现「源代码管理」。',
+      'install.gitTitle': '① 从 GitHub 直接安装',
+      'install.gitBody': '在终端里把本仓库作为 bundle 装进 profile：',
+      'install.linkNote': '也可以本地开发挂载：<code>dsh plugin --profile desktop add link:/path/to/repo</code>。',
+      'install.marketTitle': '② 通过插件市场',
+      'install.step1': '设置 → 插件 → 实验性插件 → 更多 → 打开「自定义插件市场」',
+      'install.step2': '「发现」→「添加索引源」→ 粘贴下面的索引地址',
+      'install.step3': '在卡片里安装，确认来源为 Git 仓库与固定提交',
+      'shot.title': '截图',
+      'shot.sub': '右侧边栏里的多存储库源代码管理：存储库 / 更改 / 图形三段。',
+      'shot.caption': '存储库 5 · 更改 · 图形（提交历史与分支走向）',
+      'res.title': '资源',
+      'res.readme': 'README',
+      'res.market': '插件市场索引',
+      'res.cover32': '封面 3:2',
+      'res.coverSq': '封面方形',
+      'footer.plugin': 'DeepSeek Harness 插件（dsh-plugin）',
+      'ui.copy': '复制'
+    },
+    en: {
+      'meta.title': 'dsh-git-sidebar — Git source control in the DeepSeek Harness right sidebar',
+      'meta.desc': 'A VS Code-style multi-repository Git source control panel for the DeepSeek Harness desktop Web GUI right sidebar: repository visibility management, staging and commits, inline diffs, a commit graph with commit details, pull/push/sync.',
+      'hero.title': '<span class="accent">Git source control</span><br>right in the DeepSeek Harness sidebar',
+      'hero.lead': 'A VS Code <em>Source Control</em>–style multi-repository panel: it discovers the session directory, nested repositories and registered workspaces, with per-file stage/discard, inline diffs, commits (including amend and undo), branches, pull/push/sync, and an SVG commit graph with expandable commit details.',
+      'hero.install': 'Install',
+      'hero.docs': 'Docs',
+      'hero.caption': 'Right sidebar · multi-repository · stage / commit / branch / graph',
+      'features.title': 'Features',
+      'features.sub': 'Matches the VS Code Source Control layout while fitting the narrow sidebar.',
+      'f1.title': 'Multi-repository',
+      'f1.body': 'Lists every Git repository in the session directory, nested folders and registered workspaces, with branch, ahead/behind and sync per row. The eye button in the header shows or hides individual repositories, or only those with changes.',
+      'f2.title': 'Staging & commits',
+      'f2.body': 'Changes / Staged Changes groups with per-file stage, unstage and discard. The commit button has a menu (commit all / commit & push / amend / undo last commit) and keeps the last 20 commit messages per repository.',
+      'f3.title': 'Inline diffs',
+      'f3.body': 'Click a file row to expand a unified diff with +/- colors and hunk headers; untracked files get a synthesized addition diff, with notes for binary and oversized files. The file list supports filtering and tree/flat views.',
+      'f4.title': 'Commit graph',
+      'f4.body': 'SVG lane graph with parent links and hollow double-ring merge nodes; branch multi-select with a legend, and a commit filter. Click any commit for details (changed files with +N/-N, per-file diff) and to check out, branch from it, or tag it.',
+      'f5.title': 'Repository actions',
+      'f5.body': 'Fetch / pull / push / sync, branch switch, create and delete, stash, tags, worktrees, clone, and a GIT output viewer with the last 60 commands.',
+      'f6.title': 'Security boundary',
+      'f6.body': 'Repositories are always derived from the session directory; a root override is only accepted inside the session directory or a registered workspace, and anything outside is rejected.',
+      'install.title': 'Install',
+      'install.sub': 'Pick either path; after installing, confirm the bundle is enabled under Settings → Plugins — “Source Control” then appears under the right sidebar <code>+</code>.',
+      'install.gitTitle': '① Install from GitHub',
+      'install.gitBody': 'Add the repository to a profile as a bundle:',
+      'install.linkNote': 'For local development, link-mount a checkout: <code>dsh plugin --profile desktop add link:/path/to/repo</code>.',
+      'install.marketTitle': '② Install via the plugin market',
+      'install.step1': 'Settings → Plugins → Experimental plugins → More → Open the custom plugin market',
+      'install.step2': 'Discover → Add index source → paste the index URL below',
+      'install.step3': 'Install from the card; the confirmation shows the Git source and the pinned commit',
+      'shot.title': 'Screenshot',
+      'shot.sub': 'Multi-repository source control in the right sidebar: Repositories / Changes / Graph.',
+      'shot.caption': 'Repositories 5 · Changes · Graph (commit history and branch lanes)',
+      'res.title': 'Resources',
+      'res.readme': 'README',
+      'res.market': 'Plugin market index',
+      'res.cover32': 'Cover 3:2',
+      'res.coverSq': 'Square cover',
+      'footer.plugin': 'DeepSeek Harness plugin (dsh-plugin)',
+      'ui.copy': 'Copy'
+    }
+  };
+
+  var README_URLS = {
+    zh: 'https://github.com/hennychen/dsh-git-sidebar/blob/main/README.md',
+    en: 'https://github.com/hennychen/dsh-git-sidebar/blob/main/README.en.md'
+  };
+
+  function applyLanguage(lang) {
+    var dict = I18N[lang] || I18N.zh;
+    document.documentElement.lang = lang === 'en' ? 'en' : 'zh-CN';
+    document.title = dict['meta.title'];
+    var desc = document.querySelector('meta[name="description"]');
+    if (desc) desc.setAttribute('content', dict['meta.desc']);
+    var ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.setAttribute('content', dict['meta.title']);
+    var ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) ogDesc.setAttribute('content', dict['meta.desc']);
+
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n');
+      if (dict[key] !== undefined) el.textContent = dict[key];
+    });
+    document.querySelectorAll('[data-i18n-html]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n-html');
+      if (dict[key] !== undefined) el.innerHTML = dict[key];
+    });
+    document.querySelectorAll('[data-i18n-title]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n-title');
+      if (dict[key] !== undefined) el.setAttribute('title', dict[key]);
+    });
+    document.querySelectorAll('[data-readme]').forEach(function (el) {
+      el.setAttribute('href', README_URLS[lang] || README_URLS.zh);
+    });
+    document.querySelectorAll('[data-lang-btn]').forEach(function (button) {
+      button.classList.toggle('on', button.getAttribute('data-lang-btn') === lang);
+    });
+    try { localStorage.setItem('dsh-git-sidebar:lang', lang); } catch (e) {}
+  }
+
+  var saved = null;
+  try { saved = localStorage.getItem('dsh-git-sidebar:lang'); } catch (e) {}
+  var initial = saved === 'en' || saved === 'zh'
+    ? saved
+    : (navigator.language || '').toLowerCase().indexOf('en') === 0 ? 'en' : 'zh';
+  applyLanguage(initial);
+
+  document.querySelectorAll('[data-lang-btn]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      applyLanguage(button.getAttribute('data-lang-btn'));
+    });
+  });
+
   document.querySelectorAll('.copy').forEach(function (button) {
     button.addEventListener('click', function () {
       var value = button.getAttribute('data-copy') || '';
